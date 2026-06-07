@@ -1,5 +1,5 @@
 "use client";
-import { authClient } from "@/shared/lib/auth";
+import { authClient } from "@shared/lib/auth";
 
 export default function Home() {
   const testSignIn = async () => {
