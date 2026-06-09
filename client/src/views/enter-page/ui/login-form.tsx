@@ -5,27 +5,88 @@ import {
   CardTitle,
 } from "@/shared/ui/card";
 import { Button } from "@shared/ui/button";
-import { Input } from "@shared/ui/input";
-import { Label } from "@shared/ui/label";
+import FormInput from "./forms-input";
+import { useForm } from "react-hook-form";
+import ErrorMsg from "./error-msg";
+import { authClient } from "@/shared/lib/auth";
+import { Separator } from "@/shared/ui/separator";
+import GoogleEnter from "@/feature/google-enter";
+
+interface IFormInput {
+  email: string;
+  password: string;
+}
 
 const LoginForm = () => {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<IFormInput>({
+    mode: "onSubmit",
+  });
+
+  const onSubmit = async (data: IFormInput) => {
+    const res = await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+      callbackURL: "/dashboard",
+    });
+
+    setError("root", {
+      type: "server",
+      message: res.error?.message ?? "login failed",
+    });
+  };
+
   return (
     <>
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-2">
-          <Label htmlFor="tabs-email">Email</Label>
-          <Input id="tabs-email" placeholder="some@gmail.com" required />
+      <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <CardContent>
+          <div className="grid gap-2">
+            <FormInput
+              label="Email"
+              placeholder="some@gmail.com"
+              {...register("email", {
+                required: { value: true, message: "Email is required" },
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  message: "Invalid email address",
+                },
+              })}
+            />
 
-          <Label htmlFor="tabs-password">Password</Label>
-          <Input id="tabs-password" placeholder="123" required />
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button>Sign In</Button>
-      </CardFooter>
+            <ErrorMsg error={errors.email?.message} />
+
+            <FormInput
+              type="password"
+              label="Password"
+              placeholder="123"
+              {...register("password", {
+                required: "Password is required",
+              })}
+            />
+
+            <ErrorMsg error={errors.password?.message} />
+            <ErrorMsg error={errors.root?.message} />
+
+            <div className="flex items-center w-full">
+              <Separator className="flex-1 " />
+              <p className="px-3 text-sm text-gray-500">or</p>
+              <Separator className="flex-1" />
+            </div>
+
+            <GoogleEnter />
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit">Sign In</Button>
+        </CardFooter>
+      </form>
     </>
   );
 };

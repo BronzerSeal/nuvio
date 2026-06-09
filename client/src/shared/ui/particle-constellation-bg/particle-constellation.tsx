@@ -269,7 +269,7 @@ export default function ParticleConstellation({
       const fg = dark ? "255,255,255" : "28,25,22";
 
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = dark ? "#110F0C" : "#F5FEFD";
+      ctx.fillStyle = dark ? "#110F0C" : "#f5fafa";
       ctx.fillRect(0, 0, W, H);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -365,7 +365,7 @@ export default function ParticleConstellation({
     <div
       ref={containerRef}
       className={`${className} min-h-screen w-full overflow-hidden`}
-      style={{ background: isDark ? "#110F0C" : "#F5FEFD" }}
+      style={{ background: isDark ? "#110F0C" : "#f5fafa" }}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
     </div>
