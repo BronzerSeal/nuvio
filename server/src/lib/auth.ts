@@ -27,5 +27,5 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  trustedOrigins: [websiteUrl],
+  trustedOrigins: [websiteUrl, "https://nuvio.vercel.app"],
 });

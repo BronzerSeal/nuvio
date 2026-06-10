@@ -11,6 +11,8 @@ import ErrorMsg from "./error-msg";
 import { authClient } from "@/shared/lib/auth";
 import { Separator } from "@/shared/ui/separator";
 import GoogleEnter from "@/feature/google-enter";
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
+import { useRouter } from "next/navigation";
 
 interface IFormInput {
   email: string;
@@ -18,6 +20,7 @@ interface IFormInput {
 }
 
 const LoginForm = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -31,13 +34,16 @@ const LoginForm = () => {
     const res = await authClient.signIn.email({
       email: data.email,
       password: data.password,
-      callbackURL: "/dashboard",
     });
 
-    setError("root", {
-      type: "server",
-      message: res.error?.message ?? "login failed",
-    });
+    if (res.data?.user.id) {
+      router.replace(SITE_ENDPOINTS.dashboards);
+    } else {
+      setError("root", {
+        type: "server",
+        message: res.error?.message ?? "login failed",
+      });
+    }
   };
 
   return (

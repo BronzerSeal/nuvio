@@ -1,3 +1,4 @@
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import { authClient } from "@/shared/lib/auth";
 import Image from "next/image";
 
@@ -10,7 +11,7 @@ export default function GoogleEnter({
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3000/dashboard",
+        callbackURL: SITE_ENDPOINTS.dashboards,
       });
     } catch (error) {
       console.error(error);

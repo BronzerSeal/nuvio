@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import ErrorMsg from "./error-msg";
 import { authClient } from "@/shared/lib/auth";
 import { useRouter } from "next/navigation";
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 
 interface IFormInput {
   email: string;
@@ -38,13 +39,13 @@ const RegisterPage = () => {
     });
 
     if (res.data?.user.id) {
-      router.push("./dashboard");
+      router.replace(SITE_ENDPOINTS.dashboards);
+    } else {
+      setError("root", {
+        type: "server",
+        message: res.error?.message ?? "Registration failed",
+      });
     }
-
-    setError("root", {
-      type: "server",
-      message: res.error?.message ?? "Registration failed",
-    });
   };
 
   return (
