@@ -8,7 +8,7 @@ import {
   HighlightItem,
   type HighlightItemProps,
   type HighlightProps,
-} from "./highlight";
+} from "../../highlight/highlight";
 import { getStrictContext } from "@/shared/utils/get-strict-context";
 import { Slot, type WithAsChild } from "./slot";
 
