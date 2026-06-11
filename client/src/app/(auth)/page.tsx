@@ -2,6 +2,6 @@
 
 import EnterPage from "@/views/enter-page";
 
-export default function Home() {
+export default function EnterRoute() {
   return <EnterPage />;
 }

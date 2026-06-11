@@ -15,7 +15,8 @@ export const DATA = {
     name: "Skyleen",
     email: "skyleen@example.com",
     avatar:
-      "https://pbs.twimg.com/profile_images/1909615404789506048/MTqvRsjo_400x400.jpg",
+      // "https://pbs.twimg.com/profile_images/1909615404789506048/MTqvRsjo_400x400.jpg",
+      undefined,
   },
   teams: [
     {
