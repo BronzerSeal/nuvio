@@ -7,7 +7,7 @@ import {
 import { Button } from "@shared/ui/button";
 import FormInput from "./forms-input";
 import { useForm } from "react-hook-form";
-import ErrorMsg from "./error-msg";
+import ErrorMsg from "@shared/ui/error-msg";
 import { authClient } from "@/shared/lib/auth";
 import { Separator } from "@/shared/ui/separator";
 import GoogleEnter from "@/feature/google-enter";

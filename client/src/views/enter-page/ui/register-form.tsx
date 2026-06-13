@@ -7,7 +7,7 @@ import {
 import { Button } from "@shared/ui/button";
 import FormInput from "./forms-input";
 import { useForm } from "react-hook-form";
-import ErrorMsg from "./error-msg";
+import ErrorMsg from "@/shared/ui/error-msg";
 import { authClient } from "@/shared/lib/auth";
 import { useRouter } from "next/navigation";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";

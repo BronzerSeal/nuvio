@@ -20,8 +20,10 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
   sessions      Session[]
   accounts      Account[]
+  memberships   CompanyMember[]
 
   @@unique([email])
   @@map("user")
@@ -73,4 +75,54 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String   @unique()
+  createdAt DateTime @default(now())
+
+  members CompanyMember[]
+  boards  Board[]
+}
+
+enum CompanyRoles {
+  member
+  admin
+  owner
+}
+
+
+model CompanyMember {
+  id        String        @id @default(cuid())
+  role      CompanyRoles  @default(member) 
+
+  userId    String
+  companyId String
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@index([companyId])
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  name      String
+  companyId String
+  tasks     Task[]
+  
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  title     String
+  status    String   @default("todo")
+  createdAt DateTime @default(now())
+
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
