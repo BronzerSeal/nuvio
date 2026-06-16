@@ -14,3 +14,5 @@ export {
   type DialogTitleProps,
   type DialogDescriptionProps,
 } from "./dialog-headless";
+
+export { Modal } from "./dialog-modal";

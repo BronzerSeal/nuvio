@@ -1,6 +1,7 @@
 export const SERVER_ENDPOINTS = {
   company: {
     joinOrCreateCompany: `company/join-or-create`,
+    userCompanies: "company/user-companies",
   },
   user: {
     getMemberships: "user/me/companies",

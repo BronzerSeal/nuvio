@@ -1,6 +1,10 @@
+import { CompanyIcon } from "@/entity/company";
+
 export type Company = {
   id: string;
   name: string;
+  logo: CompanyIcon;
+  plan: string;
   createdAt: string;
 };
 

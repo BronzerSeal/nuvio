@@ -2,35 +2,32 @@
 
 import ChooseCompany from "./choose-company";
 import { useUserMemberships } from "@/entity/user";
-import NoBoards from "./no-boards";
-import { useCompanyBoards } from "@/entity/board";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 const DashboardPage = () => {
+  const router = useRouter();
   const { data: userMemberships, isLoading: isUserMembershipsLoading } =
     useUserMemberships();
 
-  const currentCompany = userMemberships?.[0];
+  // const { data: companyBoards, isLoading: iscompanyBoardsLoading } =
+  //   useCompanyBoards(currentCompany?.id!, !!currentCompany?.id);
 
-  const { data: companyBoards, isLoading: iscompanyBoardsLoading } =
-    useCompanyBoards(currentCompany?.id!, !!currentCompany?.id);
+  React.useEffect(() => {
+    if (userMemberships?.length) {
+      router.push(`/dashboard/${userMemberships[0].id}/boards`);
+    }
+  }, [userMemberships, router]);
 
-  if (isUserMembershipsLoading || iscompanyBoardsLoading) return <p>Loading</p>;
-
-  //юзер уже все создал
   const hasCompanies = (userMemberships?.length ?? 0) > 0;
-  const hasBoards = (companyBoards?.length ?? 0) > 0;
-
-  const everythingOkey = hasCompanies && hasBoards;
-
   return (
     <div className="h-full">
       <div className="flex h-full flex-col items-center justify-center">
-        {!hasCompanies && <ChooseCompany />}
-        {!hasBoards && hasCompanies && (
+        {isUserMembershipsLoading && <p>Loading</p>}
+        {!isUserMembershipsLoading && !hasCompanies && <ChooseCompany />}
+        {/* {!hasBoards && hasCompanies && (
           <NoBoards currentCompany={currentCompany} />
-        )}
-
-        {everythingOkey && <p>HII</p>}
+        )} */}
       </div>
     </div>
   );

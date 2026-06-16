@@ -80,6 +80,8 @@ model Verification {
 model Company {
   id        String   @id @default(cuid())
   name      String   @unique()
+  logo      String   @default("gallery")
+  plan      String?
   createdAt DateTime @default(now())
 
   members CompanyMember[]

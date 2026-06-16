@@ -7,10 +7,10 @@ const router = Router();
 // POST /company/join-or-create
 router.post("/join-or-create", authMiddleware, async (req, res) => {
   const userId = req.user.id;
-  const { companyName: companyNameReq } = req.body;
+  const { companyName: companyNameReq, description, logo } = req.body;
   const companyName = companyNameReq?.trim()?.toLowerCase();
 
-  if (!userId || !companyName) {
+  if (!userId || !companyName || !logo) {
     return res.status(400).json({ message: "No data provided" });
   }
 
@@ -25,6 +25,8 @@ router.post("/join-or-create", authMiddleware, async (req, res) => {
       const company = await prisma.company.create({
         data: {
           name: companyName,
+          plan: description,
+          logo,
         },
       });
 
@@ -59,6 +61,35 @@ router.post("/join-or-create", authMiddleware, async (req, res) => {
 
       return res.status(409).json({ message: `user already in company` });
     }
+  } catch (error) {
+    return res.status(500).json({
+      message: `Server Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    });
+  }
+});
+
+// GET /company/user-companies
+router.get("/user-companies", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+
+  if (!userId) {
+    return res.status(400).json({ message: "No data provided" });
+  }
+
+  try {
+    const companies = await prisma.company.findMany({
+      where: {
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json(companies);
   } catch (error) {
     return res.status(500).json({
       message: `Server Error: ${

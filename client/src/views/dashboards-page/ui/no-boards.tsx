@@ -9,6 +9,7 @@ import {
   DialogFooter,
   DialogTitle,
   DialogDescription,
+  Modal,
 } from "@/shared/ui/dialog";
 import { Label } from "@/shared/ui/label";
 import { Input } from "@/shared/ui/input";
@@ -67,7 +68,48 @@ const NoBoards: React.FC<Props> = ({ currentCompany }) => {
         Create your first
       </Button>
 
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
+      <Modal
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Create board"
+        description="A interactive place to distribute tasks"
+        children={
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <div className="grid gap-4">
+              <div className="grid gap-3">
+                <Label htmlFor="name-1">Name</Label>
+                <Input
+                  id="name-1"
+                  placeholder="Pixel"
+                  required
+                  {...register("boardName", {
+                    required: "board name is required",
+                  })}
+                />
+
+                <ErrorMsg error={errors.root?.message} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Create</Button>
+            </DialogFooter>
+          </form>
+        }
+      />
+    </>
+  );
+};
+
+export default NoBoards;
+
+{
+  /* <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
         <DialogPanel showCloseButton={true} className="sm:max-w-[425px]">
           <form
             className="flex flex-col gap-4"
@@ -102,9 +144,5 @@ const NoBoards: React.FC<Props> = ({ currentCompany }) => {
             </DialogFooter>
           </form>
         </DialogPanel>
-      </Dialog>
-    </>
-  );
-};
-
-export default NoBoards;
+      </Dialog> */
+}
