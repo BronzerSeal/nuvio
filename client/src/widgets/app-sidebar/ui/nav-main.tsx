@@ -14,12 +14,29 @@ import {
   SidebarMenuSubButton,
 } from "@/shared/ui/sidebar";
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, PlusIcon } from "lucide-react";
 import { DATA } from "../consts/consts";
+import React from "react";
+import { CreateBoardModal } from "@/entity/board/ui/create-board-modal";
 
 const NavMain = () => {
+  const [isNewBoardOpen, setIsNewBoardOpen] = React.useState(false);
   return (
     <SidebarGroup>
+      {/* new board */}
+      <SidebarMenuSubItem
+        className="cursor-pointer"
+        onClick={() => setIsNewBoardOpen((prev) => !prev)}
+      >
+        <SidebarMenuSubButton asChild className="h-8">
+          <div>
+            <PlusIcon />
+            <p>new board</p>
+          </div>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+
+      {/* else */}
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {DATA.navMain.map((item) => (
@@ -60,6 +77,8 @@ const NavMain = () => {
           </Collapsible>
         ))}
       </SidebarMenu>
+
+      <CreateBoardModal isOpen={isNewBoardOpen} setIsOpen={setIsNewBoardOpen} />
     </SidebarGroup>
   );
 };

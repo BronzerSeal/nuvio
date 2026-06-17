@@ -6,9 +6,9 @@ import {
   SidebarRail,
 } from "@shared/ui/sidebar";
 import NavUser from "./nav-user";
-import NavProjects from "./nav-projects";
 import NavMain from "./nav-main";
 import TeamSwitcher from "./team-switcher";
+import NavBoards from "./nav-boards";
 
 export function AppSidebar() {
   return (
@@ -19,7 +19,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <NavMain />
-        <NavProjects />
+        <NavBoards />
       </SidebarContent>
 
       <SidebarFooter>

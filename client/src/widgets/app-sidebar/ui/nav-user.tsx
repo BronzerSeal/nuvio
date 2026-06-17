@@ -21,12 +21,26 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { DATA } from "../consts/consts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
+import { authClient } from "@/shared/lib/auth";
+import { useRouter } from "next/navigation";
 
 const NavUser = () => {
   const isMobile = useIsMobile();
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); // redirect to login page
+        },
+      },
+    });
+  };
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -37,12 +51,19 @@ const NavUser = () => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={DATA.user.avatar} alt={DATA.user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage
+                  src={session?.user.image ?? undefined}
+                  alt={session?.user.name}
+                />
+                <AvatarFallback className="rounded-lg">
+                  {session?.user.name?.slice(0, 1)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{DATA.user.name}</span>
-                <span className="truncate text-xs">{DATA.user.email}</span>
+                <span className="truncate font-semibold">
+                  {session?.user.name}
+                </span>
+                <span className="truncate text-xs">{session?.user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -56,14 +77,19 @@ const NavUser = () => {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={DATA.user.avatar} alt={DATA.user.name} />
+                  <AvatarImage
+                    src={session?.user.image ?? undefined}
+                    alt={session?.user.name}
+                  />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {DATA.user.name}
+                    {session?.user.name}
                   </span>
-                  <span className="truncate text-xs">{DATA.user.email}</span>
+                  <span className="truncate text-xs">
+                    {session?.user.email}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -90,7 +116,7 @@ const NavUser = () => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut />
               Log out
             </DropdownMenuItem>

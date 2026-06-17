@@ -1,7 +1,7 @@
-import React from "react";
+import SelectBoardPage from "@/views/select-board-page";
 
-const BoardPageRoute = () => {
-  return <div>BoardPageRoute</div>;
+const SelectBoardPageRoute = () => {
+  return <SelectBoardPage />;
 };
 
-export default BoardPageRoute;
+export default SelectBoardPageRoute;

@@ -1,1 +1,1 @@
-export { useCompanyBoards } from "./queries/queries";
+export { useCompanyBoards, useCreateBoard } from "./queries/queries";

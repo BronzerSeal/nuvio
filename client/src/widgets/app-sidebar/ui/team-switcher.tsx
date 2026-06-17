@@ -22,6 +22,7 @@ import {
 } from "@/entity/company";
 import { TeamSwitcherSkeleton } from "./team-switcher-skeleton";
 import { useParams, useRouter } from "next/navigation";
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 
 const TeamSwitcher = () => {
   const isMobile = useIsMobile();
@@ -36,7 +37,7 @@ const TeamSwitcher = () => {
     if (!companies?.length) return;
 
     if (!activeTeamId) {
-      router.replace(`/dashboard/${companies[0].id}/boards`);
+      router.replace(SITE_ENDPOINTS.companyBoards(companies[0].id));
     }
   }, [companies, activeTeamId, router]);
 
@@ -103,7 +104,7 @@ const TeamSwitcher = () => {
                   <DropdownMenuItem
                     key={team.name}
                     onClick={() => {
-                      router.push(`/dashboard/${team.id}/boards`);
+                      router.push(SITE_ENDPOINTS.companyBoards(team.id));
                     }}
                     className="gap-2 p-2"
                   >

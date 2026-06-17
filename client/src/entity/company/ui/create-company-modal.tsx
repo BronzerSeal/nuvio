@@ -10,6 +10,7 @@ import { getErrorMessage } from "@/shared/utils/get-error-msg";
 import { COMPANY_ICONS, CompanyIcon } from "../consts/company-icons";
 import { cn } from "@/shared/lib/utils";
 import { useRouter } from "next/navigation";
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 
 interface IFormInput {
   companyName: string;
@@ -60,7 +61,7 @@ export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
         reset();
         setIsOpen(false);
 
-        router.push(`/dashboard/${createdCompany.companyId}/boards`);
+        router.push(SITE_ENDPOINTS.companyBoards(createdCompany.companyId));
       },
     });
   };
