@@ -2,7 +2,8 @@
 import { useCompanyBoards } from "@/entity/board";
 import { useParams } from "next/navigation";
 import NoBoards from "./no-boards";
-import { GlitchLoader, SimpleLoader } from "@/shared/ui/loader";
+import { GlitchLoader } from "@/shared/ui/loader";
+import SelectBoard from "./select-board";
 
 const SelectBoardPage = () => {
   const { companyId } = useParams() as { companyId: string | undefined };
@@ -11,7 +12,6 @@ const SelectBoardPage = () => {
     companyId!,
     !!companyId,
   );
-  //   console.log(companyBoards);
 
   const hasBoards = (companyBoards?.length ?? 0) > 0;
   return (
@@ -19,9 +19,7 @@ const SelectBoardPage = () => {
       <div className="flex h-full flex-col items-center justify-center">
         {isLoading && <GlitchLoader text="loading" />}
         {!isLoading && !hasBoards && <NoBoards />}
-        {!isLoading && hasBoards && (
-          <p>Choose board from sidebar or create New</p>
-        )}
+        {!isLoading && hasBoards && <SelectBoard />}
       </div>
     </div>
   );

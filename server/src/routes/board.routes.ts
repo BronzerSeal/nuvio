@@ -5,7 +5,7 @@ import prisma from "../lib/prisma.js";
 const router = Router();
 
 // POST /board/new-board
-router.post("/new-board", authMiddleware, async (req: any, res) => {
+router.post("/new-board", authMiddleware, async (req, res) => {
   const { name, companyId } = req.body;
 
   if (!name || !companyId) {
@@ -33,17 +33,17 @@ router.post("/new-board", authMiddleware, async (req: any, res) => {
       },
     });
 
-    res.json(board);
+    res.status(200).json(board);
   } catch (error) {
     return res.status(500).json({ message: `Server Error: ${error}` });
   }
 });
 
 // GET /board/company/:companyId
-router.get("/company/:companyId", authMiddleware, async (req: any, res) => {
+router.get("/company/:companyId", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { companyId } = req.params;
+    const { companyId } = req.params as { companyId: string | undefined };
 
     if (!companyId) {
       return res.status(400).json({ message: "No companyId" });
@@ -73,7 +73,53 @@ router.get("/company/:companyId", authMiddleware, async (req: any, res) => {
       },
     });
 
-    return res.json(boards);
+    return res.status(200).json(boards);
+  } catch (error) {
+    return res.status(500).json({
+      message: `Server Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    });
+  }
+});
+
+//GET /board/:companyId/board-info/:boardId
+router.get("/:companyId/boards/:boardId", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { boardId, companyId } = req.params as {
+      boardId: string | undefined;
+      companyId: string | undefined;
+    };
+
+    if (!boardId || !companyId) {
+      return res.status(400).json({ message: "Missing params" });
+    }
+
+    const board = await prisma.board.findFirst({
+      where: {
+        id: boardId,
+        companyId: companyId,
+        company: {
+          members: {
+            some: {
+              userId,
+            },
+          },
+        },
+      },
+      include: {
+        tasks: true,
+      },
+    });
+
+    if (!board) {
+      return res.status(404).json({
+        message: "Board not found or access denied",
+      });
+    }
+
+    return res.status(200).json(board);
   } catch (error) {
     return res.status(500).json({
       message: `Server Error: ${

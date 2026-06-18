@@ -1,7 +1,7 @@
-import React from "react";
+import BoardPage from "@/views/board-page";
 
 const BoardPageRoute = () => {
-  return <div>BoardPageRoute</div>;
+  return <BoardPage />;
 };
 
 export default BoardPageRoute;

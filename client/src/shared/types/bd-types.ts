@@ -14,3 +14,11 @@ export type Board = {
   id: string;
   name: string;
 };
+
+export type Task = {
+  id: string;
+};
+
+export type BoardWithTasks = Board & {
+  tasks: Task[];
+};

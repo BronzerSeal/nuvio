@@ -9,5 +9,8 @@ export const SERVER_ENDPOINTS = {
   board: {
     createBoard: "/board/new-board",
     companyBoard: "/board/company/", // <- companyId
+
+    getCurrentBoard: (companyId: string, boardId: string) =>
+      `/board/${companyId}/boards/${boardId}`,
   },
 };
