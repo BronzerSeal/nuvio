@@ -5,6 +5,7 @@ import { auth } from "./lib/auth.js";
 import boardRouter from "./routes/board.routes.js";
 import companyRouter from "./routes/company.routes.js";
 import userRouter from "./routes/user.routes.js";
+import taskRouter from "./routes/task.routes.js";
 import "dotenv/config";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use("/api/board", boardRouter);
 app.use("/api/company", companyRouter);
 app.use("/api/user", userRouter);
+app.use("/api/task", taskRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

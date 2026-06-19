@@ -24,6 +24,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   memberships   CompanyMember[]
+  tasks         Task[]
 
   @@unique([email])
   @@map("user")
@@ -119,12 +120,33 @@ model Board {
   createdAt DateTime @default(now())
 }
 
-model Task {
-  id        String   @id @default(cuid())
-  title     String
-  status    String   @default("todo")
-  createdAt DateTime @default(now())
+enum TaskStatus {
+  backlog
+  inProgress
+  done
+}
+enum TaskPriority {
+  low
+  medium
+  high
+}
 
-  boardId   String
-  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+model Task {
+  id            String        @id @default(cuid())
+  title         String
+  description   String?
+
+  priority      TaskPriority  @default(low)
+  status        TaskStatus    @default(backlog)
+  position      Int           @default(0)
+  
+  dueDate       DateTime?
+  createdAt     DateTime      @default(now())
+
+
+  boardId       String
+  board         Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  assigneeId    String?
+  assignee      User?         @relation(fields: [assigneeId], references: [id])
 }

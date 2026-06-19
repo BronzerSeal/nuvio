@@ -83,7 +83,7 @@ router.get("/company/:companyId", authMiddleware, async (req, res) => {
   }
 });
 
-//GET /board/:companyId/board-info/:boardId
+//GET /board/:companyId/boards/:boardId
 router.get("/:companyId/boards/:boardId", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -108,9 +108,6 @@ router.get("/:companyId/boards/:boardId", authMiddleware, async (req, res) => {
           },
         },
       },
-      include: {
-        tasks: true,
-      },
     });
 
     if (!board) {
@@ -120,6 +117,45 @@ router.get("/:companyId/boards/:boardId", authMiddleware, async (req, res) => {
     }
 
     return res.status(200).json(board);
+  } catch (error) {
+    return res.status(500).json({
+      message: `Server Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    });
+  }
+});
+
+//GET /:boardId/tasks
+router.get("/:boardId/tasks", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { boardId } = req.params as { boardId: string | undefined };
+
+    const tasks = await prisma.task.findMany({
+      where: {
+        boardId,
+        board: {
+          company: {
+            members: {
+              some: { userId },
+            },
+          },
+        },
+      },
+      include: {
+        assignee: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: [{ status: "asc" }, { position: "asc" }],
+    });
+
+    return res.status(200).json(tasks);
   } catch (error) {
     return res.status(500).json({
       message: `Server Error: ${

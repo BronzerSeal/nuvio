@@ -31,10 +31,12 @@ const NavBoards = () => {
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Boards</SidebarGroupLabel>
       <SidebarMenu>
-        {!companyId || isCompanyBoardsLoading ? (
+        {isCompanyBoardsLoading ? (
           <div className="p-2">
             <SimpleLoader />
           </div>
+        ) : !companyId ? (
+          <p>no company</p>
         ) : (
           companyBoards?.map((item) => (
             <SidebarMenuItem key={item.id}>

@@ -4,11 +4,20 @@ import { getCompanyBoards } from "../model/get-company-boards";
 import { createBoard } from "../model/create-board";
 import { toast } from "sonner";
 import { queryClient } from "@/shared/lib/query-client";
+import { getBoardTasks } from "../model/get-board-tasks";
 
 export const useCompanyBoards = (companyId: string, enabled: boolean) => {
   return useQuery({
     queryKey: ["company-boards", companyId],
     queryFn: () => getCompanyBoards(companyId),
+    enabled,
+  });
+};
+
+export const useBoardTasks = (boardId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ["board-task", boardId],
+    queryFn: () => getBoardTasks(boardId),
     enabled,
   });
 };
