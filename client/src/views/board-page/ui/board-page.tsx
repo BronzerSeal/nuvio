@@ -1,10 +1,12 @@
 "use client";
 import BoardWidget from "@/widgets/canban-widget";
+import { Skeleton } from "@/shared/ui/skeleton";
 import { useCurrentBoard } from "../queries/queries";
 import { useParams } from "next/navigation";
 import { Button } from "@/shared/ui/button";
 import { useState } from "react";
 import { CreateTaskModal } from "@/entity/task";
+import EmptyState from "@/shared/ui/empty-state";
 
 const BoardPage = () => {
   const { companyId, boardId } = useParams() as {
@@ -21,19 +23,29 @@ const BoardPage = () => {
 
   console.log(boardInfo, error);
 
-  if (isBoardInfoLoading) return <p className="p-2">Loading</p>;
-  if (!boardInfo) return <p className="p-2">Not found or Access denied</p>;
+  if (!boardInfo && !isBoardInfoLoading)
+    return <EmptyState text="Not found board or Access denied" />;
+
   return (
     <div className="p-2 text-lg font-semibold">
-      <h1 className="mb-2">{boardInfo?.name}</h1>
-      <Button
-        className="w-full mb-5 mt-2"
-        onClick={() => setIsCreateTaskOpen((prev) => !prev)}
-      >
-        Create task
-      </Button>
+      {isBoardInfoLoading ? (
+        <Skeleton className="h-8 w-1/3 mb-2" />
+      ) : (
+        <h1 className="mb-2">{boardInfo?.name}</h1>
+      )}
 
-      <BoardWidget />
+      {isBoardInfoLoading ? (
+        <Skeleton className="h-10 w-full mb-5 mt-2" />
+      ) : (
+        <Button
+          className="w-full mb-5 mt-2"
+          onClick={() => setIsCreateTaskOpen((prev) => !prev)}
+        >
+          Create task
+        </Button>
+      )}
+
+      <BoardWidget globalLoading={isBoardInfoLoading} />
 
       <CreateTaskModal
         setIsOpen={setIsCreateTaskOpen}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Kanban, KanbanBoard, KanbanOverlay } from "@/shared/ui/kanban";
 import { TaskColumn } from "./task-column";
 import { useBoardTasks } from "@/entity/board/queries/queries";
@@ -8,6 +8,8 @@ import { useParams } from "next/navigation";
 import { transformTasksToColumns } from "../model/transformTasks";
 import { EMPTY_COLUMNS } from "../consts/consts";
 import { useUpdateTask } from "@/entity/task/queries/queries";
+import CanbanWidgetSkeleton from "./canban-widget-skeleton";
+import { getChangedTasks } from "../model/get-changed-tasks";
 
 export interface KanbanTask {
   id: string;
@@ -19,7 +21,11 @@ export interface KanbanTask {
   dueDate?: string;
 }
 
-export default function BoardWidget() {
+export default function BoardWidget({
+  globalLoading,
+}: {
+  globalLoading?: boolean;
+}) {
   const { boardId } = useParams() as { boardId: string | undefined };
 
   const { data: tasks, isLoading: isColumnsLoading } = useBoardTasks(
@@ -31,29 +37,36 @@ export default function BoardWidget() {
   const [columns, setColumns] =
     useState<Record<string, KanbanTask[]>>(EMPTY_COLUMNS);
 
+  const prevColumnsRef = useRef(columns);
+
+  useEffect(() => {
+    prevColumnsRef.current = columns;
+  }, [columns]);
+
   useEffect(() => {
     if (!tasks) return;
 
     setColumns(transformTasksToColumns(tasks));
   }, [tasks]);
-
-  if (isColumnsLoading) return <p>Column Loading</p>;
+  if (isColumnsLoading || globalLoading) {
+    return <CanbanWidgetSkeleton />;
+  }
 
   return (
     <Kanban
       value={columns}
       onValueChange={(newColumns) => {
+        const prevColumns = prevColumnsRef.current;
+
         setColumns(newColumns);
 
-        Object.entries(newColumns).forEach(([status, tasks]) => {
-          tasks.forEach((task, index) => {
-            updateTask.mutate({
-              taskId: task.id,
-              status: status as any,
-              position: index,
-            });
-          });
+        const changedTasks = getChangedTasks(prevColumns, newColumns);
+
+        changedTasks.forEach((task) => {
+          updateTask.mutate(task);
         });
+
+        prevColumnsRef.current = newColumns;
       }}
       getItemValue={(item) => item.id}
     >
