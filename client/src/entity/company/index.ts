@@ -1,3 +1,7 @@
-export { useJoinOrCreateCompany, useUserCompanies } from "./queries/queries";
+export {
+  useJoinOrCreateCompany,
+  useUserCompanies,
+  useCompanyMemberships,
+} from "./queries/queries";
 export { CreateCompanyModal } from "./ui/create-company-modal";
 export { type CompanyIcon, COMPANY_ICONS } from "./consts/company-icons";

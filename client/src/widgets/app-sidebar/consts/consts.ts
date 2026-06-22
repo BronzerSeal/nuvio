@@ -1,40 +1,14 @@
 import {
-  GalleryVerticalEnd,
-  AudioWaveform,
-  Command,
   SquareTerminal,
   Bot,
   BookOpen,
   Settings2,
   Frame,
   PieChart,
+  User,
 } from "lucide-react";
 
 export const DATA = {
-  user: {
-    name: "Skyleen",
-    email: "skyleen@example.com",
-    avatar:
-      // "https://pbs.twimg.com/profile_images/1909615404789506048/MTqvRsjo_400x400.jpg",
-      undefined,
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
       title: "Playground",
@@ -57,9 +31,9 @@ export const DATA = {
       ],
     },
     {
-      title: "Models",
+      title: "Members",
       url: "#",
-      icon: Bot,
+      icon: User,
       items: [
         {
           title: "Genesis",

@@ -56,7 +56,6 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   });
 
   const onSubmit = async (data: IFormInput) => {
-    console.log(data);
     if (!boardId || !session?.user.id) return;
 
     const formData = {

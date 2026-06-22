@@ -18,6 +18,7 @@ import { ChevronRight, PlusIcon } from "lucide-react";
 import { DATA } from "../consts/consts";
 import React from "react";
 import { CreateBoardModal } from "@/entity/board/ui/create-board-modal";
+import { MemberDrawer } from "./drawer/member-drawer";
 
 const NavMain = () => {
   const [isNewBoardOpen, setIsNewBoardOpen] = React.useState(false);
@@ -76,6 +77,8 @@ const NavMain = () => {
             </SidebarMenuItem>
           </Collapsible>
         ))}
+
+        <MemberDrawer />
       </SidebarMenu>
 
       <CreateBoardModal isOpen={isNewBoardOpen} setIsOpen={setIsNewBoardOpen} />

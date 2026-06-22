@@ -2,9 +2,13 @@ export const SERVER_ENDPOINTS = {
   company: {
     joinOrCreateCompany: `company/join-or-create`,
     userCompanies: "company/user-companies",
+
+    CompanyMemberships: (companyId: string) =>
+      `/company/${companyId}/memberships`,
   },
   user: {
     getMemberships: "user/me/companies",
+    findUsers: "user/",
   },
   board: {
     createBoard: "/board/new-board",

@@ -16,7 +16,6 @@ const SelectBoardPage = () => {
   } = useCompanyBoards(companyId!, !!companyId);
 
   const hasBoards = (companyBoards?.length ?? 0) > 0;
-  console.log(companyBoards, error);
 
   if (error)
     return <EmptyState text="Not found company boards or Access denied" />;

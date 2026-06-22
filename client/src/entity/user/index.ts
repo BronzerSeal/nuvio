@@ -1,1 +1,1 @@
-export { useUserMemberships } from "./queries/queries";
+export { useUserMemberships, useFindUsers } from "./queries/queries";

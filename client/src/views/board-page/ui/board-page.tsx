@@ -15,13 +15,11 @@ const BoardPage = () => {
   };
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
 
-  const {
-    data: boardInfo,
-    isLoading: isBoardInfoLoading,
-    error,
-  } = useCurrentBoard(boardId!, companyId!, !!boardId && !!companyId);
-
-  console.log(boardInfo, error);
+  const { data: boardInfo, isLoading: isBoardInfoLoading } = useCurrentBoard(
+    boardId!,
+    companyId!,
+    !!boardId && !!companyId,
+  );
 
   if (!boardInfo && !isBoardInfoLoading)
     return <EmptyState text="Not found board or Access denied" />;
