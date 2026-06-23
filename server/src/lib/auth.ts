@@ -20,4 +20,11 @@ export const auth = betterAuth({
     enabled: true,
   },
   trustedOrigins: [websiteUrl, "https://nuvio.vercel.app"],
+
+  defaultCookieAttributes: {
+    sameSite: "none",
+    secure: true,
+    path: "/",
+    httpOnly: true,
+  },
 });
