@@ -10,7 +10,7 @@ import {
   type HighlightProps,
 } from "../../highlight/highlight";
 import { getStrictContext } from "@/shared/utils/get-strict-context";
-import { Slot, type WithAsChild } from "./slot";
+import { Slot, type WithAsChild } from "@shared/ui/slot";
 
 type TabsContextType = {
   activeValue: string;

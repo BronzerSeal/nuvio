@@ -6,8 +6,9 @@ export async function proxy(request: NextRequest) {
   const protectedRoutes = ["/dashboard"];
   const authRoutes = ["/"];
 
-  // const token = request.cookies.get("better-auth.session_token");
-  const token = request.cookies.get("__Secure-better-auth.session_token");
+  const token =
+    request.cookies.get("__Secure-better-auth.session_token") ??
+    request.cookies.get("better-auth.session_token");
 
   /**  Неавторизован → пытается попасть в доску */
   if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {

@@ -8,7 +8,6 @@ import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getErrorMessage } from "@/shared/utils/get-error-msg";
 import { useParams, useRouter } from "next/navigation";
-import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import { useCreateTask } from "../queries/queries";
 import { DueCalendar } from "./due-calendar";
 import { PriorityOption, SelectPriority } from "./select-priority";
@@ -46,7 +45,7 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     handleSubmit,
     setError,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormInput>({
     mode: "onSubmit",
     defaultValues: {
@@ -103,7 +102,7 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
 
               <ErrorMsg error={errors.root?.message} />
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center">
               <Controller
                 name="dueDate"
                 control={control}
@@ -112,33 +111,37 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
                 )}
               />
 
-              <Controller
-                name="priority"
-                control={control}
-                render={({ field }) => (
-                  <SelectPriority
-                    onChange={field.onChange}
-                    options={priorities}
-                  />
-                )}
-              />
-
-              <Avatar>
-                <AvatarImage
-                  src={session?.user.image || undefined}
-                  alt="user-avatar"
+              <div className="flex items-center gap-2 w-full">
+                <Controller
+                  name="priority"
+                  control={control}
+                  render={({ field }) => (
+                    <SelectPriority
+                      onChange={field.onChange}
+                      options={priorities}
+                    />
+                  )}
                 />
-                <AvatarFallback>
-                  {session?.user.name.slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+
+                <Avatar>
+                  <AvatarImage
+                    src={session?.user.image || undefined}
+                    alt="user-avatar"
+                  />
+                  <AvatarFallback>
+                    {session?.user.name.slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Create
+            </Button>
           </DialogFooter>
         </form>
       }

@@ -10,6 +10,7 @@ import {
   useCreateCompanyMember,
   useDeleteCompanyMember,
 } from "@/entity/company/queries/queries";
+import { LiquidButton } from "@/shared/ui/liquid-button";
 
 export function UserAddCard({
   user,
@@ -60,26 +61,29 @@ export function UserAddCard({
       >
         <CardContent className="border-border cursor-pointer border-b p-4 [.border-b]:pb-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={user?.image || undefined} alt="user-avatar" />
-                <AvatarFallback>{user?.name?.slice(0, 2)}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <CardTitle>{user.name}</CardTitle>
-                <CardDescription className="mt-1">{user.email}</CardDescription>
-              </div>
+            <Avatar className="shrink-0 mr-2">
+              <AvatarImage src={user?.image || undefined} alt="user-avatar" />
+              <AvatarFallback>{user?.name?.slice(0, 2)}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <CardTitle>{user.name}</CardTitle>
+              <CardDescription className="mt-1 truncate">
+                {user.email}
+              </CardDescription>
             </div>
-            <Button
-              className={` ${user.isMember ? `bg-green-700 dark:bg-green-800 hover:bg-green-800` : "bg-gray-400 dark:bg-gray-700 hover:bg-gray-500"} `}
+
+            <LiquidButton
+              variant={user.isMember ? "destructive" : "default"}
+              size={"default"}
+              className="shrink-0"
               onClick={
                 user.isMember
                   ? handleDeleteUserFromCompany
                   : handleAddUserToCompany
               }
             >
-              {user.isMember ? <LogOut /> : <Plus />}
-            </Button>
+              {user.isMember ? <LogOut color="black" /> : <Plus />}
+            </LiquidButton>
           </div>
         </CardContent>
       </MagicCard>

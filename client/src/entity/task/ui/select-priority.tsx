@@ -21,6 +21,7 @@ export function SelectPriority({
   options,
   value,
   onChange,
+  className,
 }: {
   options: PriorityOption[];
   value?: string;
@@ -28,11 +29,12 @@ export function SelectPriority({
     value: string | null,
     eventDetails: SelectRootChangeEventDetails,
   ) => void;
+  className?: string;
 }) {
   const selected = options.find((o) => o.value === value);
 
   return (
-    <Field className="max-w-xs">
+    <Field className={`max-w-xs ${className}`}>
       <Select
         value={value}
         onValueChange={onChange}
