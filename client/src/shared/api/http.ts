@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 
 export const http = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL + "/api/",
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
