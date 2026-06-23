@@ -5,10 +5,11 @@ import { MagicCard } from "@shared/ui/magic-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { UserWithMembershipsId } from "@/shared/types/bd-types";
 import { Button } from "@/shared/ui/button";
-import { Plus, X } from "lucide-react";
-import { useCreateCompanyMember } from "@/entity/company/queries/queries";
-import { toast } from "sonner";
-import { getErrorMessage } from "@/shared/utils/get-error-msg";
+import { LogOut, Plus } from "lucide-react";
+import {
+  useCreateCompanyMember,
+  useDeleteCompanyMember,
+} from "@/entity/company/queries/queries";
 
 export function UserAddCard({
   user,
@@ -18,7 +19,8 @@ export function UserAddCard({
   companyId: string | undefined;
 }) {
   const { resolvedTheme } = useTheme();
-  const { mutate } = useCreateCompanyMember();
+  const { mutate: createUser } = useCreateCompanyMember();
+  const { mutate: deleleteUser } = useDeleteCompanyMember();
 
   if (!resolvedTheme) return null;
 
@@ -32,15 +34,18 @@ export function UserAddCard({
       memberId: user.id,
     };
 
-    mutate(formData, {
-      onError: (error) => {
-        toast.error(getErrorMessage(error));
-      },
+    createUser(formData);
+  };
 
-      onSuccess: () => {
-        toast.success("successful added to company");
-      },
-    });
+  const handleDeleteUserFromCompany = () => {
+    if (!companyId) return;
+
+    const formData = {
+      companyId,
+      memberId: user.id,
+    };
+
+    deleleteUser(formData);
   };
 
   return (
@@ -67,9 +72,13 @@ export function UserAddCard({
             </div>
             <Button
               className={` ${user.isMember ? `bg-green-700 dark:bg-green-800 hover:bg-green-800` : "bg-gray-400 dark:bg-gray-700 hover:bg-gray-500"} `}
-              onClick={handleAddUserToCompany}
+              onClick={
+                user.isMember
+                  ? handleDeleteUserFromCompany
+                  : handleAddUserToCompany
+              }
             >
-              {user.isMember ? <X /> : <Plus />}
+              {user.isMember ? <LogOut /> : <Plus />}
             </Button>
           </div>
         </CardContent>

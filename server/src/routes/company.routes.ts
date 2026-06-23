@@ -226,4 +226,54 @@ router.post("/:companyId/memberships", authMiddleware, async (req, res) => {
   }
 });
 
+//DELETE /company/:companyId/memberships
+router.delete("/:companyId/memberships", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { companyId } = req.params as { companyId: string | undefined };
+  const { memberId } = req.query as { memberId: string | undefined };
+
+  if (!memberId || !companyId)
+    return res.status(409).json({ message: "no data provided" });
+
+  try {
+    const member = await prisma.companyMember.findFirst({
+      where: {
+        user: {
+          id: userId,
+        },
+        company: {
+          id: companyId,
+        },
+      },
+    });
+
+    if (!member || member.role === "member") {
+      return res.status(403).json({ message: "no access" });
+    }
+
+    if (memberId === userId) {
+      return res.status(400).json({
+        message: "You cannot remove yourself",
+      });
+    }
+
+    const delMember = await prisma.companyMember.delete({
+      where: {
+        userId_companyId: {
+          userId: memberId,
+          companyId,
+        },
+      },
+    });
+
+    return res.status(200).json(delMember);
+  } catch (error) {
+    return res.status(500).json({
+      message: `Server Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    });
+  }
+});
+
 export default router;

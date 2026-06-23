@@ -30,25 +30,7 @@ export const DATA = {
         },
       ],
     },
-    {
-      title: "Members",
-      url: "#",
-      icon: User,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
+
     {
       title: "Documentation",
       url: "#",
