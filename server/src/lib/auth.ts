@@ -4,8 +4,6 @@ import "dotenv/config";
 import prisma from "./prisma.js";
 
 const websiteUrl = process.env.WEBSITE_URL!;
-// console.log("WEBSITE_URL =", process.env.WEBSITE_URL);
-// console.log("BETTER_AUTH_URL =", process.env.BETTER_AUTH_URL);
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -21,12 +19,24 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  trustedOrigins: [websiteUrl, "https://nuvio.vercel.app"],
+  trustedOrigins: [
+    // "http://localhost:3000",
+    websiteUrl,
+    "https://nuvio.vercel.app",
+  ],
 
   defaultCookieAttributes: {
     sameSite: "none",
     secure: true,
     path: "/",
     httpOnly: true,
+  },
+
+  callbacks: {
+    allowedRedirects: [
+      "https://ql6wt4sg-3000.euw.devtunnels.ms/dashboard",
+      "http://localhost:3000/dashboard",
+      "https://nuvio.vercel.app/dashboard",
+    ],
   },
 });
