@@ -4,6 +4,8 @@ import "dotenv/config";
 import prisma from "./prisma.js";
 
 const websiteUrl = process.env.WEBSITE_URL!;
+// console.log("WEBSITE_URL =", process.env.WEBSITE_URL);
+// console.log("BETTER_AUTH_URL =", process.env.BETTER_AUTH_URL);
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
