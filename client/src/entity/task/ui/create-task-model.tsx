@@ -111,7 +111,7 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
                 )}
               />
 
-              <div className="flex items-center gap-2 w-full">
+              <div className="flex items-center gap-2 w-full ">
                 <Controller
                   name="priority"
                   control={control}
