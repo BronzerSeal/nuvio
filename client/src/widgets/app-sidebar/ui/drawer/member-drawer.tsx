@@ -12,7 +12,7 @@ import {
   DrawerTrigger,
 } from "@/shared/ui/drawer/drawer";
 import { SidebarMenuButton, SidebarMenuItem } from "@/shared/ui/sidebar";
-import { User, X } from "lucide-react";
+import { User } from "lucide-react";
 import { useParams } from "next/navigation";
 import { UserCard } from "./user-card";
 import React from "react";

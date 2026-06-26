@@ -10,6 +10,8 @@ import { EMPTY_COLUMNS } from "../consts/consts";
 import { useUpdateTask } from "@/entity/task/queries/queries";
 import CanbanWidgetSkeleton from "./canban-widget-skeleton";
 import { getChangedTasks } from "../model/get-changed-tasks";
+import { socket } from "@/shared/api/websockets";
+import { queryClient } from "@/shared/lib/query-client";
 
 export interface KanbanTask {
   id: string;
@@ -48,6 +50,24 @@ export default function BoardWidget({
 
     setColumns(transformTasksToColumns(tasks));
   }, [tasks]);
+
+  //WEBSOCKETS
+  useEffect(() => {
+    socket.emit("join-board", boardId);
+  }, [boardId]);
+
+  useEffect(() => {
+    socket.on("board-updated", () => {
+      queryClient.invalidateQueries({
+        queryKey: ["board-task", boardId],
+      });
+    });
+
+    return () => {
+      socket.off("board-updated");
+    };
+  }, []);
+
   if (isColumnsLoading || globalLoading) {
     return <CanbanWidgetSkeleton />;
   }

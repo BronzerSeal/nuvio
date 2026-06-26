@@ -19,6 +19,7 @@ export type UserWithMembershipsId = Omit<
 };
 
 export type CroppedUser = {
+  id: string;
   email: string;
   image: string | undefined;
   name: string;

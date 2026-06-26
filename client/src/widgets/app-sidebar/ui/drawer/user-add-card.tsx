@@ -4,50 +4,16 @@ import { Card, CardContent, CardDescription, CardTitle } from "@shared/ui/card";
 import { MagicCard } from "@shared/ui/magic-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { UserWithMembershipsId } from "@/shared/types/bd-types";
-import { Button } from "@/shared/ui/button";
-import { LogOut, Plus } from "lucide-react";
 import {
-  useCreateCompanyMember,
-  useDeleteCompanyMember,
-} from "@/entity/company/queries/queries";
-import { LiquidButton } from "@/shared/ui/liquid-button";
+  AddUserToCompanyBtn,
+  DelUserFromCompanyBtn,
+} from "@/feature/company-members-btns";
 
-export function UserAddCard({
-  user,
-  companyId,
-}: {
-  user: UserWithMembershipsId;
-  companyId: string | undefined;
-}) {
+export function UserAddCard({ user }: { user: UserWithMembershipsId }) {
   const { resolvedTheme } = useTheme();
-  const { mutate: createUser } = useCreateCompanyMember();
-  const { mutate: deleleteUser } = useDeleteCompanyMember();
-
   if (!resolvedTheme) return null;
 
   const isDark = resolvedTheme === "dark";
-
-  const handleAddUserToCompany = () => {
-    if (!companyId) return;
-
-    const formData = {
-      companyId,
-      memberId: user.id,
-    };
-
-    createUser(formData);
-  };
-
-  const handleDeleteUserFromCompany = () => {
-    if (!companyId) return;
-
-    const formData = {
-      companyId,
-      memberId: user.id,
-    };
-
-    deleleteUser(formData);
-  };
 
   return (
     <Card className="w-full max-w-sm border-none p-0 shadow-none rounded-none">
@@ -72,18 +38,11 @@ export function UserAddCard({
               </CardDescription>
             </div>
 
-            <LiquidButton
-              variant={user.isMember ? "destructive" : "default"}
-              size={"default"}
-              className="shrink-0"
-              onClick={
-                user.isMember
-                  ? handleDeleteUserFromCompany
-                  : handleAddUserToCompany
-              }
-            >
-              {user.isMember ? <LogOut color="black" /> : <Plus />}
-            </LiquidButton>
+            {user.isMember ? (
+              <DelUserFromCompanyBtn memberId={user.id} />
+            ) : (
+              <AddUserToCompanyBtn memberId={user.id} />
+            )}
           </div>
         </CardContent>
       </MagicCard>

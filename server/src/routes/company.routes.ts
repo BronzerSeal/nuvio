@@ -135,6 +135,7 @@ router.get("/:companyId/memberships", authMiddleware, async (req, res) => {
             name: true,
             email: true,
             image: true,
+            id: true,
           },
         },
       },

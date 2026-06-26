@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardTitle } from "@shared/ui/card";
 import { MagicCard } from "@shared/ui/magic-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { CroppedUser } from "@/shared/types/bd-types";
-import { LiquidButton } from "@/shared/ui/liquid-button";
-import { LogOut } from "lucide-react";
+import { DelUserFromCompanyBtn } from "@/feature/company-members-btns";
 
 export function UserCard({ user }: { user: CroppedUser }) {
   const { resolvedTheme } = useTheme();
@@ -13,7 +12,6 @@ export function UserCard({ user }: { user: CroppedUser }) {
   if (!resolvedTheme) return null;
 
   const isDark = resolvedTheme === "dark";
-
   return (
     <Card className="w-full max-w-sm border-none p-0 shadow-none rounded-none">
       <MagicCard
@@ -35,13 +33,7 @@ export function UserCard({ user }: { user: CroppedUser }) {
               </CardDescription>
             </div>
 
-            <LiquidButton
-              variant={"destructive"}
-              size={"default"}
-              className="shrink-0"
-            >
-              <LogOut color="black" />
-            </LiquidButton>
+            <DelUserFromCompanyBtn memberId={user?.id} />
           </div>
         </CardContent>
       </MagicCard>
