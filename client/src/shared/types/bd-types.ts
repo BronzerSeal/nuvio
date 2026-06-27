@@ -79,3 +79,17 @@ export type CursorPaginationResponse<T> = {
   nextCursor: string | null;
   hasNextPage: boolean;
 };
+
+//TIMELINE
+
+export type Timeline = {
+  companyId: string;
+  id: string;
+};
+
+export type TimelineRow = {
+  capacity: number;
+  id: string;
+  label: string;
+  timelineId: string;
+};

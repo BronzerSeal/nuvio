@@ -5,6 +5,8 @@ export const SERVER_ENDPOINTS = {
 
     CompanyMemberships: (companyId: string) =>
       `/company/${companyId}/memberships`,
+
+    companyTimeline: (companyId: string) => `/company/${companyId}/timeline`,
   },
   user: {
     getMemberships: "user/me/companies",
@@ -23,5 +25,8 @@ export const SERVER_ENDPOINTS = {
     createTask: "/task/new-task",
 
     updateTasks: (boardId: string) => `/task/${boardId}`,
+  },
+  timeline: {
+    TimelineRow: (timelineId: string) => `/timeline/${timelineId}/rows`,
   },
 };

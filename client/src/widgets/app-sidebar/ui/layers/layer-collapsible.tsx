@@ -1,3 +1,4 @@
+import { useCompanyTimeline } from "@/entity/timeline";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import {
   Collapsible,
@@ -16,6 +17,11 @@ import { useParams } from "next/navigation";
 
 const LayerCollapsible = () => {
   const { companyId } = useParams() as { companyId: string | undefined };
+  const { data: timeline, isLoading: isTimelineLoading } = useCompanyTimeline(
+    companyId!,
+    !!companyId,
+  );
+  console.log(timeline);
   return (
     <Collapsible asChild className="group/collapsible">
       <SidebarMenuItem>
@@ -32,15 +38,19 @@ const LayerCollapsible = () => {
           <SidebarMenuSub>
             {/* {item.items?.map((subItem) => ( */}
             <SidebarMenuSubItem>
-              <SidebarMenuSubButton asChild>
-                {companyId ? (
-                  <a href={SITE_ENDPOINTS.timeline(companyId)}>
-                    <span>Timeline</span>
-                  </a>
-                ) : (
-                  <p>No company</p>
-                )}
-              </SidebarMenuSubButton>
+              {isTimelineLoading ? (
+                <p>Loading</p>
+              ) : (
+                <SidebarMenuSubButton asChild>
+                  {companyId && timeline ? (
+                    <a href={SITE_ENDPOINTS.timeline(companyId, timeline?.id)}>
+                      <span>Timeline</span>
+                    </a>
+                  ) : (
+                    <p>No company</p>
+                  )}
+                </SidebarMenuSubButton>
+              )}
             </SidebarMenuSubItem>
             {/* ))} */}
           </SidebarMenuSub>

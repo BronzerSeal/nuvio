@@ -22,10 +22,15 @@ import { timeToMinutes } from "../model/utils";
 import ColorCodes from "./color-codes";
 import { GlassSlider } from "@/shared/ui/slider";
 import Content from "./content";
+import { useParams } from "next/navigation";
+import CreateRowBtn from "./create-row-btn";
+import { useTimelineRows } from "@/entity/timeline";
 
 export default function TimelinePage() {
   const [slots, setSlots] = useState<TimelineSlotData[]>(initialSlots);
   const [percentageInView, setPercentageInView] = useState(100);
+  const { timelineId } = useParams() as { timelineId: string | undefined };
+  const { data: timelineRows } = useTimelineRows(timelineId!, !!timelineId);
 
   const config = {
     startHour: 9,
@@ -97,7 +102,10 @@ export default function TimelinePage() {
         </div>
 
         {/* ЦВЕТА  */}
-        <ColorCodes />
+        <div className="flex  justify-between w-full">
+          <ColorCodes />
+          <CreateRowBtn />
+        </div>
 
         <TimelineProvider
           config={config}
@@ -109,8 +117,9 @@ export default function TimelinePage() {
         >
           <Timeline slots={slots} rows={dummyRows}>
             <TimelineGrid>
-              <TimelineHeader columnLabel="Rooms" className="bg-background" />
-              {dummyRows.map((row) => (
+              <TimelineHeader columnLabel="Roles" className="bg-background" />
+              {/* {dummyRows?.map((row) => ( */}
+              {timelineRows?.map((row) => (
                 <TimelineRow
                   key={row.id}
                   row={row}

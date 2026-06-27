@@ -6,28 +6,28 @@ import {
 // Demo Data
 export const dummyRows: TimelineRowData[] = [
   {
-    id: "room-1",
-    label: "Conference Room A",
+    id: "frontend",
+    label: "Frontend",
     capacity: 12,
   },
   {
     id: "room-2",
-    label: "Conference Room B",
+    label: "Backend",
     capacity: 8,
   },
   {
     id: "room-3",
-    label: "Meeting Room 1",
+    label: "QA",
     capacity: 6,
   },
   {
     id: "room-4",
-    label: "Meeting Room 2",
+    label: "Designer",
     capacity: 4,
   },
   {
     id: "room-5",
-    label: "Training Room",
+    label: "Data Engineer",
     capacity: 20,
   },
 ];
@@ -35,7 +35,7 @@ export const dummyRows: TimelineRowData[] = [
 export const initialSlots: TimelineSlotData[] = [
   {
     id: "slot-1",
-    rowId: "room-1",
+    rowId: "frontend",
     startTime: "09:30",
     duration: 60,
     title: "Team Standup",
@@ -44,7 +44,7 @@ export const initialSlots: TimelineSlotData[] = [
   },
   {
     id: "slot-2",
-    rowId: "room-1",
+    rowId: "frontend",
     startTime: "11:00",
     duration: 90,
     title: "Product Review",
