@@ -21,7 +21,7 @@ const LayerCollapsible = () => {
     companyId!,
     !!companyId,
   );
-  console.log(timeline);
+  // console.log(timeline);
   return (
     <Collapsible asChild className="group/collapsible">
       <SidebarMenuItem>

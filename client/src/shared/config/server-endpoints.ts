@@ -28,5 +28,13 @@ export const SERVER_ENDPOINTS = {
   },
   timeline: {
     TimelineRow: (timelineId: string) => `/timeline/${timelineId}/rows`,
+
+    TimelineTasks: (timelineId: string) => `/timeline/${timelineId}/tasks`,
+
+    createTimelineTask: (timelineId: string, rowId: string) =>
+      `/timeline/${timelineId}/rows/${rowId}/tasks`,
+
+    updateTask: (timelineId: string, taskId: string) =>
+      `/timeline/${timelineId}/tasks/${taskId}`,
   },
 };

@@ -2,7 +2,7 @@ import { CreateTimelineRowModal } from "@/entity/timeline/ui/create-timeline-row
 import { SlideUpButton } from "@/shared/ui/button";
 import React from "react";
 
-const CreateRowBtn = () => {
+const CreateRoleBtn = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -11,7 +11,7 @@ const CreateRowBtn = () => {
         onClick={() => setIsOpen((prev) => !prev)}
         className="bg-[#5B8FF9] text-white p-1 text-sm rounded-sm"
       >
-        Create row
+        Create role
       </SlideUpButton>
 
       <CreateTimelineRowModal isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -19,4 +19,4 @@ const CreateRowBtn = () => {
   );
 };
 
-export default CreateRowBtn;
+export default CreateRoleBtn;

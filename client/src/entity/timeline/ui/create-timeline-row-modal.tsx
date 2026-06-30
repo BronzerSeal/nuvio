@@ -6,7 +6,7 @@ import { Label } from "@/shared/ui/label";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { getErrorMessage } from "@/shared/utils/get-error-msg";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useCreateTimelineRow } from "../queries/queries";
 
 interface IFormInput {
@@ -23,7 +23,6 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
   setIsOpen,
 }) => {
   const { mutate } = useCreateTimelineRow();
-  const router = useRouter();
   const { timelineId } = useParams() as { timelineId: string | undefined };
 
   const {

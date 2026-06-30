@@ -6,7 +6,6 @@ import {
   Timeline,
   TimelineGrid,
   TimelineRow,
-  TimelineRowData,
   TimelineSlot,
   TimelineSlotData,
   TimelineSlotLabel,
@@ -17,24 +16,34 @@ import {
 import { Users, Clock } from "lucide-react";
 import { cn } from "@shared/lib/utils";
 import { getSlotBgColorClass, getSlotTextColorClass } from "../model/helpers";
-import { dummyRows, initialSlots } from "../const/const";
 import { timeToMinutes } from "../model/utils";
 import ColorCodes from "./color-codes";
 import { GlassSlider } from "@/shared/ui/slider";
 import Content from "./content";
 import { useParams } from "next/navigation";
-import CreateRowBtn from "./create-row-btn";
-import { useTimelineRows } from "@/entity/timeline";
+import { useTimelineRows, useTimelineTasks } from "@/entity/timeline";
+import CreateRoleBtn from "./create-role-btn";
+import TimelinePageSkeleton from "./timeline-page-skeleton";
+import { TimelineRow as TimelineRowType } from "@/shared/types/bd-types";
+import CreateTaskBtn from "./create-task-btn";
+import { useUpdateTimelineTask } from "@/entity/timeline/queries/queries";
 
 export default function TimelinePage() {
-  const [slots, setSlots] = useState<TimelineSlotData[]>(initialSlots);
   const [percentageInView, setPercentageInView] = useState(100);
   const { timelineId } = useParams() as { timelineId: string | undefined };
-  const { data: timelineRows } = useTimelineRows(timelineId!, !!timelineId);
+  const updateTask = useUpdateTimelineTask();
+  const { data: timelineRows, isLoading } = useTimelineRows(
+    timelineId!,
+    !!timelineId,
+  );
+  const { data: timelineTasks, isLoading: isTasksLoading } = useTimelineTasks(
+    timelineId!,
+    !!timelineId,
+  );
 
   const config = {
-    startHour: 9,
-    endHour: 18,
+    startHour: 5,
+    endHour: 24,
     snapIntervalMinutes: 15,
     columnWidth: 160,
   };
@@ -44,18 +53,18 @@ export default function TimelinePage() {
     newTime: string,
     newRowId: string,
   ) => {
-    // Update slots state
-    setSlots((prevSlots) =>
-      prevSlots.map((slot) =>
-        slot.id === slotId
-          ? { ...slot, startTime: newTime, rowId: newRowId }
-          : slot,
-      ),
-    );
+    try {
+      updateTask.mutate({
+        timelineId: timelineId!,
+        taskId: slotId,
+        startTime: newTime,
+        rowId: newRowId,
+      });
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    return true;
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   const validateDrop = (slotId: string, newTime: string, newRowId: string) => {
@@ -79,13 +88,11 @@ export default function TimelinePage() {
     return conflicts.length === 0;
   };
 
-  const handleSlotClick = (slotId: string) => {
-    const slot = slots.find((s) => s.id === slotId);
-    if (slot) {
-      console.log("Clicked slot:", slot);
-    }
-  };
+  if (isLoading || isTasksLoading) {
+    return <TimelinePageSkeleton />;
+  }
 
+  const slots = timelineTasks ?? [];
   return (
     <div>
       <Content>
@@ -102,9 +109,12 @@ export default function TimelinePage() {
         </div>
 
         {/* ЦВЕТА  */}
-        <div className="flex  justify-between w-full">
+        <div className="flex  justify-between w-full flex-wrap gap-2 sm:gap-0">
           <ColorCodes />
-          <CreateRowBtn />
+          <div className="flex gap-2 ">
+            <CreateRoleBtn />
+            <CreateTaskBtn />
+          </div>
         </div>
 
         <TimelineProvider
@@ -112,10 +122,9 @@ export default function TimelinePage() {
           percentageInView={percentageInView}
           onSlotPositionChange={handlePositionChange}
           onValidateDrop={validateDrop}
-          onSlotClick={handleSlotClick}
           className="w-full"
         >
-          <Timeline slots={slots} rows={dummyRows}>
+          <Timeline slots={slots} rows={timelineRows ?? []}>
             <TimelineGrid>
               <TimelineHeader columnLabel="Roles" className="bg-background" />
               {/* {dummyRows?.map((row) => ( */}
@@ -125,7 +134,7 @@ export default function TimelinePage() {
                   row={row}
                   slots={slots}
                   className="text-xs bg-background"
-                  renderRowHeader={(row: TimelineRowData) => {
+                  renderRowHeader={(row: TimelineRowType) => {
                     return (
                       <div className="flex flex-col gap-0.5 items-start pl-3">
                         <p className="text-xs font-medium">{row.label}</p>

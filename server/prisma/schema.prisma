@@ -158,29 +158,44 @@ model Task {
 //TIMELINE
 
 model Timeline {
-  id          String     @id @default(cuid())
-  companyId   String    @unique()
+  id          String          @id @default(cuid())
+  companyId   String          @unique()
 
   rows        TimelineRow[]
-  tasks       TimelineTask[]
 
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model TimelineRow {
-  id          String     @id @default(cuid())
+  id          String          @id @default(cuid())
   timelineId  String
   label       String
-  capacity    Int        @default(0)
+  capacity    Int             @default(0)
 
-  timeline  Timeline @relation(fields: [timelineId], references: [id],onDelete: Cascade)
+  tasks       TimelineTask[]
+  timeline    Timeline        @relation(fields: [timelineId], references: [id],onDelete: Cascade)
   
   @@unique([timelineId, label])
 }
 
+enum TaskType {
+meeting
+workshop
+break
+review
+}
+
 model TimelineTask {
   id            String      @id @default(cuid())
-  timelineId    String
+  rowId         String
 
-  timeline  Timeline @relation(fields: [timelineId], references: [id],onDelete: Cascade)
+  startTime     String
+  duration      Int
+  title         String
+  type          TaskType
+  attendees     Int
+
+  row           TimelineRow @relation(fields: [rowId], references: [id],onDelete: Cascade)
 }
+  

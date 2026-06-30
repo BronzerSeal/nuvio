@@ -93,3 +93,13 @@ export type TimelineRow = {
   label: string;
   timelineId: string;
 };
+
+export type TimelineTask = {
+  id: string;
+  attendees: number;
+  duration: number;
+  rowId: string;
+  startTime: string;
+  title: string;
+  type: string;
+};
