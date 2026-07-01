@@ -8,6 +8,8 @@ import { getTimelineRows } from "../model/get-timeline-rows";
 import { createTimelineTask } from "../model/create-timeline-task";
 import { getTimelineTask } from "../model/get-timeline-tasks";
 import { updateTimelineTask } from "../model/update-timeline-task";
+import { DeleteTimelineRows } from "../model/delete-timeline-rows";
+import { DeleteTimelineTasks } from "../model/delete-timeline-tasks";
 
 export const useCompanyTimeline = (companyId: string, enabled: boolean) => {
   return useQuery({
@@ -123,6 +125,60 @@ export const useUpdateTimelineTask = () => {
 
     onSuccess: () => {
       toast.success("Task updated");
+    },
+
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+
+    onSettled: (_, __, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["timeline-tasks", variables.timelineId],
+      });
+    },
+  });
+};
+
+export const useDeleteTimelineRows = () => {
+  return useMutation({
+    mutationKey: ["delete-timeline-rows"],
+    mutationFn: ({
+      timelineId,
+      rowIds,
+    }: {
+      timelineId: string;
+      rowIds: string[];
+    }) => DeleteTimelineRows(timelineId, rowIds),
+
+    onSuccess: () => {
+      toast.success("Rows deleted");
+    },
+
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+
+    onSettled: (_, __, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["timeline-rows", variables.timelineId],
+      });
+    },
+  });
+};
+
+export const useDeleteTimelineTasks = () => {
+  return useMutation({
+    mutationKey: ["delete-timeline-tasks"],
+    mutationFn: ({
+      timelineId,
+      taskIds,
+    }: {
+      timelineId: string;
+      taskIds: string[];
+    }) => DeleteTimelineTasks(timelineId, taskIds),
+
+    onSuccess: () => {
+      toast.success("Tasks deleted");
     },
 
     onError: (error) => {

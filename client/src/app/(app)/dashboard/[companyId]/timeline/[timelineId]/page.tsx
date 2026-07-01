@@ -1,5 +1,5 @@
 "use client";
-import TimelinePageSkeleton from "@/views/timeline-page/ui/timeline-page-skeleton";
+import TimelinePageSkeleton from "@/views/timeline-page/ui/shared/timeline-page-skeleton";
 // import TimelinePage from "@/views/timeline-page";
 import dynamic from "next/dynamic";
 

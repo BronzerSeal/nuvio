@@ -6,14 +6,9 @@ import { Label } from "@/shared/ui/label";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useParams } from "next/navigation";
-import {
-  useCreateTimelineRow,
-  useCreateTimelineTask,
-  useTimelineRows,
-} from "../queries/queries";
+import { useCreateTimelineTask, useTimelineRows } from "../queries/queries";
 import { SelectType } from "./select-type";
 import { SelectRow } from "./select-row";
-import { GlitchLoader } from "@/shared/ui/loader";
 import { getErrorMessage } from "@/shared/utils/get-error-msg";
 
 interface IFormInput {
@@ -152,9 +147,10 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
             </div>
           </div>
           <DialogFooter>
-            <div className="flex justify-between w-full">
+            <div className="flex w-full items-center">
               <ErrorMsg error={errors.root?.message} />
-              <div className="flex gap-2">
+
+              <div className="ml-auto flex gap-2">
                 <Button variant="outline" onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>

@@ -1,45 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import {
-  TimelineProvider,
-  Timeline,
-  TimelineGrid,
-  TimelineRow,
-  TimelineSlot,
-  TimelineSlotData,
-  TimelineSlotLabel,
-  TimelineSlotContent,
-  TimelineHeader,
-  TimelineCurrentTime,
-} from "@shared/ui/timeline/timeline";
-import { Users, Clock } from "lucide-react";
-import { cn } from "@shared/lib/utils";
-import { getSlotBgColorClass, getSlotTextColorClass } from "../model/helpers";
+import { useEffect, useState } from "react";
+import { TimelineProvider } from "@shared/ui/timeline/timeline";
 import { timeToMinutes } from "../model/utils";
-import ColorCodes from "./color-codes";
-import { GlassSlider } from "@/shared/ui/slider";
 import Content from "./content";
 import { useParams } from "next/navigation";
 import { useTimelineRows, useTimelineTasks } from "@/entity/timeline";
-import CreateRoleBtn from "./create-role-btn";
-import TimelinePageSkeleton from "./timeline-page-skeleton";
-import { TimelineRow as TimelineRowType } from "@/shared/types/bd-types";
-import CreateTaskBtn from "./create-task-btn";
+import TimelinePageSkeleton from "./shared/timeline-page-skeleton";
+
 import { useUpdateTimelineTask } from "@/entity/timeline/queries/queries";
+import EmptyState from "@/shared/ui/empty-state";
+import Zoom from "./zoom";
+import Nav from "./nav";
+import TimelineContent from "./timeline-content";
+import { socket } from "@/shared/api/websockets";
+import { queryClient } from "@/shared/lib/query-client";
 
 export default function TimelinePage() {
   const [percentageInView, setPercentageInView] = useState(100);
   const { timelineId } = useParams() as { timelineId: string | undefined };
   const updateTask = useUpdateTimelineTask();
-  const { data: timelineRows, isLoading } = useTimelineRows(
-    timelineId!,
-    !!timelineId,
-  );
-  const { data: timelineTasks, isLoading: isTasksLoading } = useTimelineTasks(
-    timelineId!,
-    !!timelineId,
-  );
+  const {
+    data: timelineRows,
+    isLoading,
+    isError,
+  } = useTimelineRows(timelineId!, !!timelineId);
+  const {
+    data: timelineTasks,
+    isLoading: isTasksLoading,
+    isError: isTasksError,
+  } = useTimelineTasks(timelineId!, !!timelineId);
 
   const config = {
     startHour: 5,
@@ -88,6 +78,32 @@ export default function TimelinePage() {
     return conflicts.length === 0;
   };
 
+  //WEBSOCKETS
+  useEffect(() => {
+    socket.emit("join-timeline", timelineId);
+  }, [timelineId]);
+
+  useEffect(() => {
+    socket.on("timeline-task-updated", () => {
+      queryClient.invalidateQueries({
+        queryKey: ["timeline-tasks", timelineId],
+      });
+    });
+
+    socket.on("timeline-row-updated", () => {
+      queryClient.invalidateQueries({
+        queryKey: ["timeline-rows", timelineId],
+      });
+    });
+
+    return () => {
+      socket.off("timeline-updated");
+    };
+  }, []);
+
+  if (isError || isTasksError)
+    return <EmptyState text="Not found timeline or Access denied" />;
+
   if (isLoading || isTasksLoading) {
     return <TimelinePageSkeleton />;
   }
@@ -96,26 +112,10 @@ export default function TimelinePage() {
   return (
     <div>
       <Content>
-        <div className="flex flex-wrap gap-2 mt-4 w-full">
-          <p className="leading-none mb-0  min-w-20">Zoom level</p>
-          <GlassSlider
-            className="w-full"
-            value={percentageInView}
-            onValueChange={setPercentageInView}
-            colorA={"#06D6A0"}
-            colorB={"#5B8FF9"}
-            delay={0.08 + 1 * 0.06}
-          />
-        </div>
+        <Zoom value={percentageInView} onValueChange={setPercentageInView} />
 
-        {/* ЦВЕТА  */}
-        <div className="flex  justify-between w-full flex-wrap gap-2 sm:gap-0">
-          <ColorCodes />
-          <div className="flex gap-2 ">
-            <CreateRoleBtn />
-            <CreateTaskBtn />
-          </div>
-        </div>
+        {/* ЦВЕТА + КНОПКИ */}
+        <Nav />
 
         <TimelineProvider
           config={config}
@@ -124,67 +124,7 @@ export default function TimelinePage() {
           onValidateDrop={validateDrop}
           className="w-full"
         >
-          <Timeline slots={slots} rows={timelineRows ?? []}>
-            <TimelineGrid>
-              <TimelineHeader columnLabel="Roles" className="bg-background" />
-              {/* {dummyRows?.map((row) => ( */}
-              {timelineRows?.map((row) => (
-                <TimelineRow
-                  key={row.id}
-                  row={row}
-                  slots={slots}
-                  className="text-xs bg-background"
-                  renderRowHeader={(row: TimelineRowType) => {
-                    return (
-                      <div className="flex flex-col gap-0.5 items-start pl-3">
-                        <p className="text-xs font-medium">{row.label}</p>
-                        <div className="flex items-center gap-1">
-                          <Users className="w-3 h-3 text-muted-foreground" />
-                          <p className="text-xs font-medium text-muted-foreground">
-                            {row.capacity}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  }}
-                >
-                  {(slot: TimelineSlotData) => (
-                    <TimelineSlot
-                      slot={slot}
-                      className={cn(
-                        "gap-0 flex flex-col items-start justify-center px-2 bg-background dark:bg-zinc-900",
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          getSlotBgColorClass(slot.type),
-                          "w-1 h-full absolute top-0 left-0",
-                        )}
-                      />
-                      <div className="p-1 h-full flex flex-col justify-between">
-                        <TimelineSlotLabel
-                          className={cn(getSlotTextColorClass(slot.type))}
-                        >
-                          {slot.title}
-                        </TimelineSlotLabel>
-                        <TimelineSlotContent className="text-foreground flex gap-1">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {slot.startTime}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {slot.attendees}
-                          </span>
-                        </TimelineSlotContent>
-                      </div>
-                    </TimelineSlot>
-                  )}
-                </TimelineRow>
-              ))}
-              <TimelineCurrentTime />
-            </TimelineGrid>
-          </Timeline>
+          <TimelineContent slots={slots} timelineRows={timelineRows ?? []} />
         </TimelineProvider>
       </Content>
     </div>

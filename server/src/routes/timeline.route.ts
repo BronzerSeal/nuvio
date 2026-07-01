@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { requireCompanyRole } from "../helpers/requireCompanyRole.js";
 import prisma from "../lib/prisma.js";
+import { io } from "../server.js";
 
 const router = Router();
 
@@ -53,7 +54,58 @@ router.post("/:timelineId/rows", authMiddleware, async (req, res) => {
       },
     });
 
+    io.to(timelineId).emit("timeline-row-updated");
+
     return res.status(201).json(newRow);
+  } catch (error) {
+    return res.status(500).json({
+      message: `Server Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    });
+  }
+});
+
+// DELETE /timeline/:timelineId/rows
+router.delete("/:timelineId/rows", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { timelineId } = req.params as { timelineId?: string };
+  const { rowIds } = req.body as { rowIds?: string[] };
+
+  if (!timelineId || !rowIds || !rowIds.length) {
+    return res.status(400).json({ message: "no data provided" });
+  }
+
+  try {
+    const timeline = await prisma.timeline.findUnique({
+      where: { id: timelineId },
+      select: { companyId: true },
+    });
+
+    if (!timeline) {
+      return res.status(404).json({ message: "timeline not found" });
+    }
+
+    try {
+      await requireCompanyRole(userId, timeline.companyId, ["owner", "admin"]);
+    } catch {
+      return res.status(403).json({
+        message: "no access",
+      });
+    }
+
+    const deleted = await prisma.timelineRow.deleteMany({
+      where: {
+        id: { in: rowIds },
+        timelineId,
+      },
+    });
+
+    io.to(timelineId).emit("timeline-row-updated");
+
+    return res.status(200).json({
+      deletedCount: deleted.count,
+    });
   } catch (error) {
     return res.status(500).json({
       message: `Server Error: ${
@@ -185,6 +237,8 @@ router.post(
         },
       });
 
+      io.to(timelineId).emit("timeline-task-updated");
+
       return res.status(201).json(newTask);
     } catch (error) {
       return res.status(500).json({
@@ -297,7 +351,60 @@ router.patch("/:timelineId/tasks/:taskId", authMiddleware, async (req, res) => {
       },
     });
 
+    io.to(timelineId).emit("timeline-task-updated");
+
     return res.status(200).json(updated);
+  } catch (error) {
+    return res.status(500).json({
+      message: `Server Error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    });
+  }
+});
+
+//DELETE /timeline/:timelineId/tasks
+router.delete("/:timelineId/tasks", authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  const { timelineId } = req.params as { timelineId?: string };
+  const { taskIds } = req.body as { taskIds?: string[] };
+
+  if (!timelineId || !taskIds || !taskIds.length) {
+    return res.status(400).json({ message: "no data provided" });
+  }
+
+  try {
+    const timeline = await prisma.timeline.findUnique({
+      where: { id: timelineId },
+      select: { companyId: true },
+    });
+
+    if (!timeline) {
+      return res.status(404).json({ message: "timeline not found" });
+    }
+
+    try {
+      await requireCompanyRole(userId, timeline.companyId, ["owner", "admin"]);
+    } catch {
+      return res.status(403).json({
+        message: "no access",
+      });
+    }
+
+    const deleted = await prisma.timelineTask.deleteMany({
+      where: {
+        id: { in: taskIds },
+        row: {
+          timelineId,
+        },
+      },
+    });
+
+    io.to(timelineId).emit("timeline-task-updated");
+
+    return res.status(200).json({
+      deletedCount: deleted.count,
+    });
   } catch (error) {
     return res.status(500).json({
       message: `Server Error: ${

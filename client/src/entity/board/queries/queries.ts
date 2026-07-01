@@ -5,6 +5,7 @@ import { createBoard } from "../model/create-board";
 import { toast } from "sonner";
 import { queryClient } from "@/shared/lib/query-client";
 import { getBoardTasks } from "../model/get-board-tasks";
+import { deleteBoard } from "../model/delete-board";
 
 export const useCompanyBoards = (companyId: string, enabled: boolean) => {
   return useQuery({
@@ -35,6 +36,23 @@ export const useCreateBoard = () => {
 
     onSuccess: () => {
       toast.success("board created ");
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["company-boards"],
+      });
+    },
+  });
+};
+
+export const useDeleteBoard = () => {
+  return useMutation({
+    mutationKey: ["delete-board"],
+    mutationFn: (boardId: string) => deleteBoard(boardId),
+
+    onSuccess: () => {
+      toast.success("board deleted ");
     },
 
     onSettled: () => {

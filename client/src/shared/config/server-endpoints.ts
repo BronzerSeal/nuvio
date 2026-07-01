@@ -18,6 +18,8 @@ export const SERVER_ENDPOINTS = {
 
     getBoardTasks: (boardId: string) => `/board/${boardId}/tasks`,
 
+    deleteBaord: (boardId: string) => `/board/${boardId}`,
+
     getCurrentBoard: (companyId: string, boardId: string) =>
       `/board/${companyId}/boards/${boardId}`,
   },
