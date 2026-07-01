@@ -5,6 +5,8 @@ export const SERVER_ENDPOINTS = {
 
     CompanyMemberships: (companyId: string) =>
       `/company/${companyId}/memberships`,
+
+    companyTimeline: (companyId: string) => `/company/${companyId}/timeline`,
   },
   user: {
     getMemberships: "user/me/companies",
@@ -16,6 +18,8 @@ export const SERVER_ENDPOINTS = {
 
     getBoardTasks: (boardId: string) => `/board/${boardId}/tasks`,
 
+    deleteBaord: (boardId: string) => `/board/${boardId}`,
+
     getCurrentBoard: (companyId: string, boardId: string) =>
       `/board/${companyId}/boards/${boardId}`,
   },
@@ -23,5 +27,16 @@ export const SERVER_ENDPOINTS = {
     createTask: "/task/new-task",
 
     updateTasks: (boardId: string) => `/task/${boardId}`,
+  },
+  timeline: {
+    TimelineRow: (timelineId: string) => `/timeline/${timelineId}/rows`,
+
+    TimelineTasks: (timelineId: string) => `/timeline/${timelineId}/tasks`,
+
+    createTimelineTask: (timelineId: string, rowId: string) =>
+      `/timeline/${timelineId}/rows/${rowId}/tasks`,
+
+    updateTask: (timelineId: string, taskId: string) =>
+      `/timeline/${timelineId}/tasks/${taskId}`,
   },
 };

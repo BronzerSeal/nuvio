@@ -25,7 +25,7 @@ const LoginForm = () => {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
@@ -90,7 +90,9 @@ const LoginForm = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit">Sign In</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            Sign In
+          </Button>
         </CardFooter>
       </form>
     </>

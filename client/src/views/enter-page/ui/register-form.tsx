@@ -26,7 +26,7 @@ const RegisterPage = () => {
     handleSubmit,
     watch,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
@@ -117,7 +117,9 @@ const RegisterPage = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit">Create</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            Create
+          </Button>
         </CardFooter>
       </form>
     </>

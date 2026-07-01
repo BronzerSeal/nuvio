@@ -27,6 +27,9 @@
     "@aceternity": "https://ui.aceternity.com/registry/{name}.json",
     "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json",
     "@reui": "https://reui.io/r/{style}/{name}.json",
-    "@magicui": "https://magicui.design/r/{name}"
+    "@magicui": "https://magicui.design/r/{name}",
+    "@abui": "https://abui.io/r/{name}.json",
+    "@evilbuttons": "https://evilbuttons.radiumcoders.com/r/{name}.json",
+    "@dotmatrix": "https://dotmatrix.zzzzshawn.cloud/r/{name}.json"
   }
 }

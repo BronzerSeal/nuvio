@@ -36,6 +36,8 @@ const badgeVariants = cva(
           "bg-background border-border text-primary dark:bg-input/30",
         "warning-outline":
           "bg-background border-border text-warning-foreground dark:bg-input/30",
+        "blue-outline":
+          "bg-background border-border text-blue-600 dark:border-blue-400 dark:text-blue-400",
         "success-outline":
           "bg-background border-border text-success-foreground dark:bg-input/30",
         "info-outline":

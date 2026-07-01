@@ -13,16 +13,22 @@ import {
   SidebarMenuButton,
   SidebarMenuAction,
 } from "@/shared/ui/sidebar";
-import { MoreHorizontal, Folder, Forward, Trash2 } from "lucide-react";
+import { MoreHorizontal, Forward, Trash2 } from "lucide-react";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
-import { useCompanyBoards } from "@/entity/board";
+import { useCompanyBoards, useDeleteBoard } from "@/entity/board";
 import { useParams } from "next/navigation";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import { SimpleLoader } from "@/shared/ui/loader";
+import { toast } from "sonner";
+import Link from "next/link";
 
 const NavBoards = () => {
   const isMobile = useIsMobile();
-  const { companyId } = useParams() as { companyId: string | undefined };
+  const { companyId, boardId } = useParams() as {
+    companyId?: string;
+    boardId?: string;
+  };
+  const { mutate: deleteBoard } = useDeleteBoard();
 
   const { data: companyBoards, isLoading: isCompanyBoardsLoading } =
     useCompanyBoards(companyId!, !!companyId);
@@ -40,10 +46,14 @@ const NavBoards = () => {
         ) : (
           companyBoards?.map((item) => (
             <SidebarMenuItem key={item.id}>
-              <SidebarMenuButton asChild>
-                <a href={SITE_ENDPOINTS.boards(companyId, item.id)}>
-                  <span>{item.name}</span>
-                </a>
+              <SidebarMenuButton asChild isActive={boardId === item.id}>
+                {boardId === item.id ? (
+                  <span className="cursor-default">{item.name}</span>
+                ) : (
+                  <Link href={SITE_ENDPOINTS.boards(companyId!, item.id)}>
+                    {item.name}
+                  </Link>
+                )}
               </SidebarMenuButton>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -57,16 +67,18 @@ const NavBoards = () => {
                   side={isMobile ? "bottom" : "right"}
                   align={isMobile ? "end" : "start"}
                 >
-                  <DropdownMenuItem>
-                    <Folder className="text-muted-foreground" />
-                    <span>View Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      navigator.clipboard
+                        .writeText(SITE_ENDPOINTS.boards(companyId, item.id))
+                        .then(() => toast.success("Copied to clipboard"))
+                    }
+                  >
                     <Forward className="text-muted-foreground" />
                     <span>Share Project</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => deleteBoard(item.id)}>
                     <Trash2 className="text-muted-foreground" />
                     <span>Delete Project</span>
                   </DropdownMenuItem>

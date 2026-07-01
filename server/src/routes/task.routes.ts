@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import prisma from "../lib/prisma.js";
 import { createTaskSchema } from "../validate/createTaskSchema .js";
+import { io } from "../server.js";
 
 const router = Router();
 
@@ -64,6 +65,8 @@ router.post("/new-task", authMiddleware, async (req, res) => {
       },
     });
 
+    io.to(boardId).emit("board-updated");
+
     return res.status(201).json(task);
   } catch (error) {
     return res.status(500).json({
@@ -108,6 +111,8 @@ router.patch("/:taskId", authMiddleware, async (req, res) => {
         ...(position !== undefined && { position }),
       },
     });
+
+    io.to(boardId).emit("board-updated");
 
     return res.status(200).json(updated);
   } catch (error) {

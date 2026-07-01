@@ -32,7 +32,7 @@ export const CreateBoardModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     handleSubmit,
     setError,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
@@ -90,7 +90,9 @@ export const CreateBoardModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Create
+            </Button>
           </DialogFooter>
         </form>
       }

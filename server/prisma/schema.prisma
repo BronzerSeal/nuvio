@@ -87,6 +87,7 @@ model Company {
 
   members CompanyMember[]
   boards  Board[]
+  timeline Timeline?
 }
 
 enum CompanyRoles {
@@ -112,6 +113,7 @@ model CompanyMember {
   @@index([companyId])
 }
 
+// BOARD
 model Board {
   id        String   @id @default(cuid())
   name      String
@@ -152,3 +154,48 @@ model Task {
   assigneeId    String?
   assignee      User?         @relation(fields: [assigneeId], references: [id])
 }
+
+//TIMELINE
+
+model Timeline {
+  id          String          @id @default(cuid())
+  companyId   String          @unique()
+
+  rows        TimelineRow[]
+
+
+  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model TimelineRow {
+  id          String          @id @default(cuid())
+  timelineId  String
+  label       String
+  capacity    Int             @default(0)
+
+  tasks       TimelineTask[]
+  timeline    Timeline        @relation(fields: [timelineId], references: [id],onDelete: Cascade)
+  
+  @@unique([timelineId, label])
+}
+
+enum TaskType {
+meeting
+workshop
+break
+review
+}
+
+model TimelineTask {
+  id            String      @id @default(cuid())
+  rowId         String
+
+  startTime     String
+  duration      Int
+  title         String
+  type          TaskType
+  attendees     Int
+
+  row           TimelineRow @relation(fields: [rowId], references: [id],onDelete: Cascade)
+}
+  

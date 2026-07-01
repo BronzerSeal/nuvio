@@ -11,29 +11,9 @@ import {
 export const DATA = {
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-
-    {
       title: "Documentation",
       url: "#",
+      isActive: true,
       icon: BookOpen,
       items: [
         {

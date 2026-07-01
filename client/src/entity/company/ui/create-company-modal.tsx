@@ -34,7 +34,7 @@ export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     setValue,
     watch,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormInput>({
     mode: "onSubmit",
     defaultValues: {
@@ -125,7 +125,9 @@ export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Create
+            </Button>
           </DialogFooter>
         </form>
       }

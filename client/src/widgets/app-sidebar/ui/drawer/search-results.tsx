@@ -8,9 +8,7 @@ const SearchResults = ({ query }: { query: string }) => {
   const { data: users } = useFindUsers(query, companyId!, !!companyId);
 
   if (!users || users.length == 0) return <p className="px-2">no users</p>;
-  return users?.map((user) => (
-    <UserAddCard key={user.id} companyId={companyId} user={user} />
-  ));
+  return users?.map((user) => <UserAddCard key={user.id} user={user} />);
 };
 
 export default SearchResults;

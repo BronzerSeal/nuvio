@@ -19,6 +19,7 @@ export type UserWithMembershipsId = Omit<
 };
 
 export type CroppedUser = {
+  id: string;
   email: string;
   image: string | undefined;
   name: string;
@@ -77,4 +78,28 @@ export type CursorPaginationResponse<T> = {
   data: T[];
   nextCursor: string | null;
   hasNextPage: boolean;
+};
+
+//TIMELINE
+
+export type Timeline = {
+  companyId: string;
+  id: string;
+};
+
+export type TimelineRow = {
+  capacity: number;
+  id: string;
+  label: string;
+  timelineId: string;
+};
+
+export type TimelineTask = {
+  id: string;
+  attendees: number;
+  duration: number;
+  rowId: string;
+  startTime: string;
+  title: string;
+  type: string;
 };

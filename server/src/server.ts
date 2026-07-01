@@ -6,9 +6,20 @@ import boardRouter from "./routes/board.routes.js";
 import companyRouter from "./routes/company.routes.js";
 import userRouter from "./routes/user.routes.js";
 import taskRouter from "./routes/task.routes.js";
+import timelineRouter from "./routes/timeline.route.js";
+import { Server } from "socket.io";
+import { createServer } from "node:http";
 import "dotenv/config";
+import { registerSockets } from "./sockets/index.js";
 
 const app = express();
+const server = createServer(app);
+export const io = new Server(server, {
+  cors: {
+    origin: process.env.WEBSITE_URL || "http://localhost:3000",
+    credentials: true,
+  },
+});
 const port = process.env.PORT || 8000;
 
 app.use(
@@ -26,7 +37,11 @@ app.use("/api/board", boardRouter);
 app.use("/api/company", companyRouter);
 app.use("/api/user", userRouter);
 app.use("/api/task", taskRouter);
+app.use("/api/timeline", timelineRouter);
 
-app.listen(port, () => {
+//WEBSOCKETS
+registerSockets(io);
+
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
