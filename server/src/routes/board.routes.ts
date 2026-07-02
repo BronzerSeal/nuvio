@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import prisma from "../lib/prisma.js";
 import { requireCompanyRole } from "../helpers/requireCompanyRole.js";
+import { BadRequestError } from "../errors/BadRequestError .js";
 
 const router = Router();
 
@@ -10,34 +11,40 @@ router.post("/new-board", authMiddleware, async (req, res) => {
   const { name, companyId } = req.body;
 
   if (!name || !companyId) {
-    return res.status(400).json({ message: "No data provided" });
+    // return res.status(400).json({ message: "No data provided" });
+    throw new BadRequestError({
+      message: "No data provided",
+    });
   }
 
-  try {
-    const member = await prisma.companyMember.findUnique({
-      where: {
-        userId_companyId: {
-          userId: req.user.id,
-          companyId,
-        },
-      },
-    });
-
-    if (!member) {
-      return res.status(403).json({ message: "No access to company" });
-    }
-
-    const board = await prisma.board.create({
-      data: {
-        name,
+  // try {
+  const member = await prisma.companyMember.findUnique({
+    where: {
+      userId_companyId: {
+        userId: req.user.id,
         companyId,
       },
-    });
+    },
+  });
 
-    res.status(200).json(board);
-  } catch (error) {
-    return res.status(500).json({ message: `Server Error: ${error}` });
+  if (!member) {
+    throw new BadRequestError({
+      statusCode: 403,
+      message: "No access to company",
+    });
   }
+
+  const board = await prisma.board.create({
+    data: {
+      name,
+      companyId,
+    },
+  });
+
+  res.status(200).json(board);
+  // } catch (error) {
+  //   return res.status(500).json({ message: `Server Error: ${error}` });
+  // }
 });
 
 // GET /board/company/:companyId

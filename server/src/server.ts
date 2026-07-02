@@ -11,6 +11,7 @@ import { Server } from "socket.io";
 import { createServer } from "node:http";
 import "dotenv/config";
 import { registerSockets } from "./sockets/index.js";
+import { errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
 const server = createServer(app);
@@ -38,6 +39,9 @@ app.use("/api/company", companyRouter);
 app.use("/api/user", userRouter);
 app.use("/api/task", taskRouter);
 app.use("/api/timeline", timelineRouter);
+
+//ERRORS
+app.use(errorHandler);
 
 //WEBSOCKETS
 registerSockets(io);
