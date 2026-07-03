@@ -1,3 +1,4 @@
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import {
   SquareTerminal,
   Bot,
@@ -41,7 +42,7 @@ export const DATA = {
       items: [
         {
           title: "General",
-          url: "#",
+          url: `${SITE_ENDPOINTS.account}/settings`,
         },
         {
           title: "Team",
