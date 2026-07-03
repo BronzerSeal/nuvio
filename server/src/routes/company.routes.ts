@@ -2,6 +2,9 @@ import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import prisma from "../lib/prisma.js";
 import { requireCompanyRole } from "../helpers/requireCompanyRole.js";
+import { BadRequestError } from "../errors/BadRequestError.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
+import { ForbiddenError } from "../errors/ForbiddenError.js";
 
 const router = Router();
 
@@ -12,68 +15,65 @@ router.post("/join-or-create", authMiddleware, async (req, res) => {
   const companyName = companyNameReq?.trim()?.toLowerCase();
 
   if (!userId || !companyName || !logo) {
-    return res.status(400).json({ message: "No data provided" });
+    throw new BadRequestError({
+      message: "No data provided",
+    });
   }
 
-  try {
-    const isUniqueCompany = await prisma.company.findUnique({
-      where: {
+  const isUniqueCompany = await prisma.company.findUnique({
+    where: {
+      name: companyName,
+    },
+  });
+
+  if (!isUniqueCompany) {
+    const company = await prisma.company.create({
+      data: {
         name: companyName,
+        plan: description,
+        logo,
       },
     });
 
-    if (!isUniqueCompany) {
-      const company = await prisma.company.create({
-        data: {
-          name: companyName,
-          plan: description,
-          logo,
-        },
-      });
+    //COMPANY TIMELINE
+    await prisma.timeline.create({
+      data: {
+        companyId: company.id,
+      },
+    });
 
-      //COMPANY TIMELINE
-      await prisma.timeline.create({
-        data: {
-          companyId: company.id,
+    const member = await prisma.companyMember.create({
+      data: {
+        role: "owner",
+        userId,
+        companyId: company.id,
+      },
+    });
+    return res.status(200).json(member);
+  } else {
+    const existingMember = await prisma.companyMember.findUnique({
+      where: {
+        userId_companyId: {
+          userId,
+          companyId: isUniqueCompany.id,
         },
-      });
+      },
+    });
 
+    if (!existingMember) {
       const member = await prisma.companyMember.create({
         data: {
-          role: "owner",
+          role: "member",
           userId,
-          companyId: company.id,
+          companyId: isUniqueCompany.id,
         },
       });
       return res.status(200).json(member);
-    } else {
-      const existingMember = await prisma.companyMember.findUnique({
-        where: {
-          userId_companyId: {
-            userId,
-            companyId: isUniqueCompany.id,
-          },
-        },
-      });
-
-      if (!existingMember) {
-        const member = await prisma.companyMember.create({
-          data: {
-            role: "member",
-            userId,
-            companyId: isUniqueCompany.id,
-          },
-        });
-        return res.status(200).json(member);
-      }
-
-      return res.status(409).json({ message: `user already in company` });
     }
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+
+    throw new BadRequestError({
+      statusCode: 409,
+      message: "User already in company",
     });
   }
 });
@@ -82,29 +82,17 @@ router.post("/join-or-create", authMiddleware, async (req, res) => {
 router.get("/user-companies", authMiddleware, async (req, res) => {
   const userId = req.user.id;
 
-  if (!userId) {
-    return res.status(400).json({ message: "No data provided" });
-  }
-
-  try {
-    const companies = await prisma.company.findMany({
-      where: {
-        members: {
-          some: {
-            userId,
-          },
+  const companies = await prisma.company.findMany({
+    where: {
+      members: {
+        some: {
+          userId,
         },
       },
-    });
+    },
+  });
 
-    return res.status(200).json(companies);
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    });
-  }
+  return res.status(200).json(companies);
 });
 
 // GET /company/:companyId/memberships
@@ -117,63 +105,57 @@ router.get("/:companyId/memberships", authMiddleware, async (req, res) => {
     cursorId?: string;
   };
 
-  try {
-    const hasAccess = await prisma.company.findFirst({
-      where: {
-        id: companyId,
-        members: {
-          some: { userId },
-        },
+  const hasAccess = await prisma.company.findFirst({
+    where: {
+      id: companyId,
+      members: {
+        some: { userId },
       },
-    });
+    },
+  });
 
-    if (!hasAccess) {
-      return res.status(403).json({ message: "No access" });
-    }
-
-    const take = Number(limit);
-
-    const memberships = await prisma.companyMember.findMany({
-      where: {
-        companyId,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-            image: true,
-            id: true,
-          },
-        },
-      },
-      take: take + 1,
-
-      cursor: cursorId ? { id: cursorId } : undefined,
-
-      orderBy: {
-        id: "desc",
-      },
-    });
-
-    const hasNextPage = memberships.length > take;
-
-    const data = hasNextPage ? memberships.slice(0, -1) : memberships;
-
-    const lastItem = data[data.length - 1];
-
-    return res.status(200).json({
-      data,
-      nextCursor: lastItem ? lastItem.id : null,
-      hasNextPage,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+  if (!hasAccess) {
+    throw new ForbiddenError({
+      message: "No access",
     });
   }
+
+  const take = Number(limit);
+
+  const memberships = await prisma.companyMember.findMany({
+    where: {
+      companyId,
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+          image: true,
+          id: true,
+        },
+      },
+    },
+    take: take + 1,
+
+    cursor: cursorId ? { id: cursorId } : undefined,
+
+    orderBy: {
+      id: "desc",
+    },
+  });
+
+  const hasNextPage = memberships.length > take;
+
+  const data = hasNextPage ? memberships.slice(0, -1) : memberships;
+
+  const lastItem = data[data.length - 1];
+
+  return res.status(200).json({
+    data,
+    nextCursor: lastItem ? lastItem.id : null,
+    hasNextPage,
+  });
 });
 
 //POST /company/:companyId/memberships
@@ -186,46 +168,35 @@ router.post("/:companyId/memberships", authMiddleware, async (req, res) => {
   };
 
   if (!memberId || !companyId)
-    return res.status(409).json({ message: "no data provided" });
-
-  try {
-    try {
-      await requireCompanyRole(userId, companyId, ["owner", "admin"]);
-    } catch {
-      return res.status(403).json({
-        message: "no access",
-      });
-    }
-
-    const existingMember = await prisma.companyMember.findFirst({
-      where: {
-        companyId,
-        userId: memberId,
-      },
+    throw new BadRequestError({
+      message: "No data provided",
     });
 
-    if (existingMember) {
-      return res.status(400).json({
-        message: "User is already a member",
-      });
-    }
+  await requireCompanyRole(userId, companyId, ["owner", "admin"]);
 
-    const newMember = await prisma.companyMember.create({
-      data: {
-        role: memberRole,
-        userId: memberId,
-        companyId,
-      },
-    });
+  const existingMember = await prisma.companyMember.findFirst({
+    where: {
+      companyId,
+      userId: memberId,
+    },
+  });
 
-    return res.status(201).json(newMember);
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+  if (existingMember) {
+    throw new BadRequestError({
+      statusCode: 409,
+      message: "User is already a member",
     });
   }
+
+  const newMember = await prisma.companyMember.create({
+    data: {
+      role: memberRole,
+      userId: memberId,
+      companyId,
+    },
+  });
+
+  return res.status(201).json(newMember);
 });
 
 //DELETE /company/:companyId/memberships
@@ -234,48 +205,30 @@ router.delete("/:companyId/memberships", authMiddleware, async (req, res) => {
   const { companyId } = req.params as { companyId: string | undefined };
   const { memberId } = req.query as { memberId: string | undefined };
 
-  if (!memberId || !companyId)
-    return res.status(409).json({ message: "no data provided" });
-
-  try {
-    const member = await prisma.companyMember.findFirst({
-      where: {
-        user: {
-          id: userId,
-        },
-        company: {
-          id: companyId,
-        },
-      },
-    });
-
-    if (!member || member.role === "member") {
-      return res.status(403).json({ message: "no access" });
-    }
-
-    if (memberId === userId) {
-      return res.status(400).json({
-        message: "You cannot remove yourself",
-      });
-    }
-
-    const delMember = await prisma.companyMember.delete({
-      where: {
-        userId_companyId: {
-          userId: memberId,
-          companyId,
-        },
-      },
-    });
-
-    return res.status(200).json(delMember);
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+  if (!memberId || !companyId) {
+    throw new BadRequestError({
+      message: "No data provided",
     });
   }
+
+  await requireCompanyRole(userId, companyId, ["owner", "admin"]);
+
+  if (memberId === userId) {
+    throw new BadRequestError({
+      message: "You cannot remove yourself",
+    });
+  }
+
+  const delMember = await prisma.companyMember.delete({
+    where: {
+      userId_companyId: {
+        userId: memberId,
+        companyId,
+      },
+    },
+  });
+
+  return res.status(200).json(delMember);
 });
 
 //GET /company/:companyId/timeline
@@ -283,33 +236,25 @@ router.get("/:companyId/timeline", authMiddleware, async (req, res) => {
   const userId = req.user.id;
   const { companyId } = req.params as { companyId: string | undefined };
 
-  if (!companyId) return res.status(400).json({ message: "No companyId" });
-  try {
-    //есть ли доступ
-    try {
-      await requireCompanyRole(userId, companyId, ["owner", "admin", "member"]);
-    } catch {
-      return res.status(403).json({
-        message: "no access",
-      });
-    }
-
-    const timeline = await prisma.timeline.findUnique({
-      where: { companyId },
-    });
-
-    if (!timeline) {
-      return res.status(404).json({ message: "timeline not found" });
-    }
-
-    return res.status(200).json(timeline);
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+  if (!companyId) {
+    throw new BadRequestError({
+      message: "No Company id",
     });
   }
+
+  await requireCompanyRole(userId, companyId, ["owner", "admin", "member"]);
+
+  const timeline = await prisma.timeline.findUnique({
+    where: { companyId },
+  });
+
+  if (!timeline) {
+    throw new NotFoundError({
+      message: "Timeline not found",
+    });
+  }
+
+  return res.status(200).json(timeline);
 });
 
 export default router;

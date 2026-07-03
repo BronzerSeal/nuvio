@@ -1,8 +1,12 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import prisma from "../lib/prisma.js";
-import { createTaskSchema } from "../validate/createTaskSchema .js";
+import { createTaskSchema } from "../validate/createTaskSchema.js";
 import { io } from "../server.js";
+import { BadRequestError } from "../errors/BadRequestError.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
+import { ForbiddenError } from "../errors/ForbiddenError.js";
+import { requireCompanyRole } from "../helpers/requireCompanyRole.js";
 
 const router = Router();
 
@@ -11,68 +15,57 @@ router.post("/new-task", authMiddleware, async (req, res) => {
   const parsed = createTaskSchema.safeParse(req.body);
 
   if (!parsed.success) {
-    return res.status(400).json({
+    throw new BadRequestError({
       message: "Invalid data",
-      errors: parsed.error.flatten(),
+      context: { errors: parsed.error.flatten() },
     });
   }
 
   const { boardId, title, priority, description, assigneeId, dueDate } =
     parsed.data;
 
-  try {
-    const board = await prisma.board.findUnique({
-      where: { id: boardId },
-      include: {
-        company: true,
-      },
-    });
+  const board = await prisma.board.findUnique({
+    where: { id: boardId },
+    include: {
+      company: true,
+    },
+  });
 
-    if (!board) {
-      return res.status(404).json({ message: "Board not found" });
-    }
-
-    const membership = await prisma.companyMember.findUnique({
-      where: {
-        userId_companyId: {
-          userId: req.user.id,
-          companyId: board.companyId,
-        },
-      },
-    });
-
-    if (!membership) {
-      return res.status(403).json({ message: "No access" });
-    }
-
-    const task = await prisma.task.create({
-      data: {
-        title,
-        description,
-        priority,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        boardId,
-        assigneeId: assigneeId || null,
-      },
-      include: {
-        assignee: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-    });
-
-    io.to(boardId).emit("board-updated");
-
-    return res.status(201).json(task);
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${error}`,
+  if (!board) {
+    throw new NotFoundError({
+      message: "Board not found",
     });
   }
+
+  await requireCompanyRole(req.user.id, board.companyId, [
+    "member",
+    "admin",
+    "owner",
+  ]);
+
+  const task = await prisma.task.create({
+    data: {
+      title,
+      description,
+      priority,
+      dueDate: dueDate ? new Date(dueDate) : null,
+      boardId,
+      assigneeId: assigneeId || null,
+    },
+    include: {
+      assignee: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+    },
+  });
+
+  io.to(boardId).emit("board-updated");
+
+  return res.status(201).json(task);
 });
 
 // PATCH /task/:taskId
@@ -85,41 +78,43 @@ router.patch("/:taskId", authMiddleware, async (req, res) => {
     position?: number;
   };
 
-  try {
-    const task = await prisma.task.findFirst({
-      where: {
-        id: taskId,
-        boardId,
-        board: {
-          company: {
-            members: {
-              some: { userId },
-            },
+  if (!taskId) {
+    throw new BadRequestError({
+      message: "Task id is required",
+    });
+  }
+
+  const task = await prisma.task.findFirst({
+    where: {
+      id: taskId,
+      boardId,
+      board: {
+        company: {
+          members: {
+            some: { userId },
           },
         },
       },
-    });
+    },
+  });
 
-    if (!task) {
-      return res.status(403).json({ message: "No access or task not found" });
-    }
-
-    const updated = await prisma.task.update({
-      where: { id: taskId },
-      data: {
-        ...(status !== undefined && { status }),
-        ...(position !== undefined && { position }),
-      },
-    });
-
-    io.to(boardId).emit("board-updated");
-
-    return res.status(200).json(updated);
-  } catch (error) {
-    return res.status(500).json({
-      message: `Server Error: ${error}`,
+  if (!task) {
+    throw new ForbiddenError({
+      message: "No access or task not found",
     });
   }
+
+  const updated = await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      ...(status !== undefined && { status }),
+      ...(position !== undefined && { position }),
+    },
+  });
+
+  io.to(boardId).emit("board-updated");
+
+  return res.status(200).json(updated);
 });
 
 export default router;

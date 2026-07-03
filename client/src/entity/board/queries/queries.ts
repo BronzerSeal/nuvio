@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { queryClient } from "@/shared/lib/query-client";
 import { getBoardTasks } from "../model/get-board-tasks";
 import { deleteBoard } from "../model/delete-board";
+import { getErrorMessage } from "@/shared/utils/get-error-msg";
+import { useParams, useRouter } from "next/navigation";
 
 export const useCompanyBoards = (companyId: string, enabled: boolean) => {
   return useQuery({
@@ -47,18 +49,25 @@ export const useCreateBoard = () => {
 };
 
 export const useDeleteBoard = () => {
+  const router = useRouter();
+  const { companyId } = useParams<{ companyId: string }>();
+
   return useMutation({
     mutationKey: ["delete-board"],
     mutationFn: (boardId: string) => deleteBoard(boardId),
 
-    onSuccess: () => {
-      toast.success("board deleted ");
-    },
-
-    onSettled: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["company-boards"],
       });
+
+      toast.success("Board deleted");
+
+      router.push(`/dashboard/${companyId}/boards`);
+    },
+
+    onError: (err) => {
+      toast.error(getErrorMessage(err));
     },
   });
 };
