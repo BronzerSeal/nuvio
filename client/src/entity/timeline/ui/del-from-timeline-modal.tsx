@@ -28,8 +28,10 @@ export const DelFromTimelineModal: React.FC<Props> = ({
   isOpen,
   setIsOpen,
 }) => {
-  const { mutate: deleteTimelineRows } = useDeleteTimelineRows();
-  const { mutate: deleteTimelineTasks } = useDeleteTimelineTasks();
+  const { mutate: deleteTimelineRows, isPending: isDelRowPending } =
+    useDeleteTimelineRows();
+  const { mutate: deleteTimelineTasks, isPending: isDelTaskPending } =
+    useDeleteTimelineTasks();
   const { timelineId } = useParams() as { timelineId: string | undefined };
   const { data: timelineRows } = useTimelineRows(timelineId!, !!timelineId);
   const { data: timelineTasks } = useTimelineTasks(timelineId!, !!timelineId);
@@ -39,7 +41,7 @@ export const DelFromTimelineModal: React.FC<Props> = ({
     setError,
     reset,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
@@ -104,7 +106,11 @@ export const DelFromTimelineModal: React.FC<Props> = ({
               render={({ field }) => (
                 <MultiSelect
                   className="max-w-full"
-                  placeholder="select rows..."
+                  placeholder={
+                    field.value == undefined || field.value?.length == 0
+                      ? "select rows..."
+                      : ""
+                  }
                   items={timelineRows ?? []}
                   value={field.value ?? []}
                   onValueChange={field.onChange}
@@ -121,7 +127,11 @@ export const DelFromTimelineModal: React.FC<Props> = ({
               render={({ field }) => (
                 <MultiSelect
                   className="max-w-full"
-                  placeholder="select tasks..."
+                  placeholder={
+                    field.value == undefined || field.value?.length == 0
+                      ? "select tasks..."
+                      : ""
+                  }
                   items={timelineTasks ?? []}
                   value={field.value ?? []}
                   onValueChange={field.onChange}
@@ -140,7 +150,7 @@ export const DelFromTimelineModal: React.FC<Props> = ({
                 </Button>
                 <FrameButton
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isDelRowPending || isDelTaskPending}
                   variant="outline"
                   className="text-[10px] size-1"
                 >

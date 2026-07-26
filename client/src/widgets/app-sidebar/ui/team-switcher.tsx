@@ -23,11 +23,14 @@ import {
 import { TeamSwitcherSkeleton } from "./team-switcher-skeleton";
 import { useParams, useRouter } from "next/navigation";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
+import { useTheme } from "next-themes";
 
 const TeamSwitcher = () => {
   const isMobile = useIsMobile();
   const params = useParams();
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const { data: companies, isLoading } = useUserCompanies();
 
@@ -48,7 +51,7 @@ const TeamSwitcher = () => {
             className="flex items-center justify-center gap-2 cursor-pointer"
             onClick={() => setIsModalOpen((prev) => !prev)}
           >
-            <PlusIcon color="black" />
+            <PlusIcon color={isDark ? "white" : "black"} />
           </SidebarMenuButton>
         </SidebarMenuItem>
         <CreateCompanyModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />

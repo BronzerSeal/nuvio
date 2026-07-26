@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import { useLayoutEffect, useEffect, useRef, useState } from "react";
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -145,36 +146,19 @@ export default function ParticleConstellation({
   const mouseRef = useRef<{ x: number; y: number } | null>(null);
   const webRef = useRef<{ nodes: WebNode[]; strands: Strand[] } | null>(null);
   const rafRef = useRef<number>(0);
-  const [isDark, setIsDark] = useState(() =>
-    typeof window !== "undefined"
-      ? document.documentElement.classList.contains("dark")
-      : false,
-  );
-  const isDarkRef = useRef(
-    typeof window !== "undefined"
-      ? document.documentElement.classList.contains("dark")
-      : false,
-  );
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // ── Theme ──────────────────────────────────────────────────────────────────
-  useIsomorphicLayoutEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const check = () => {
-      const d = detectDark(el);
-      setIsDark(d);
-      isDarkRef.current = d;
-    };
-    check();
-    const mo = new MutationObserver(check);
-    mo.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    const w = el.closest("[data-card-theme]");
-    if (w) mo.observe(w, { attributes: true, attributeFilter: ["class"] });
-    return () => mo.disconnect();
+  useEffect(() => {
+    setMounted(true);
   }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
+  const isDarkRef = useRef(false);
+
+  useEffect(() => {
+    isDarkRef.current = isDark;
+  }, [isDark]);
 
   // ── Main loop ──────────────────────────────────────────────────────────────
   useIsomorphicLayoutEffect(() => {
@@ -205,17 +189,6 @@ export default function ParticleConstellation({
       if (alive) resize();
     });
     ro.observe(container);
-
-    const mo = new MutationObserver(() => {
-      if (alive && container) isDarkRef.current = detectDark(container);
-    });
-    const wrapper = container.closest("[data-card-theme]");
-    if (wrapper)
-      mo.observe(wrapper, { attributes: true, attributeFilter: ["class"] });
-    mo.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
 
     function tick() {
       if (!alive || !canvas || !ctx) return;
@@ -355,7 +328,6 @@ export default function ParticleConstellation({
       alive = false;
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
-      mo.disconnect();
       container.removeEventListener("mousemove", onMove);
       container.removeEventListener("mouseleave", onLeave);
     };
@@ -365,7 +337,9 @@ export default function ParticleConstellation({
     <div
       ref={containerRef}
       className={`${className} min-h-screen w-full overflow-hidden`}
-      style={{ background: isDark ? "#110F0C" : "#f5fafa" }}
+      style={{
+        background: !mounted ? "#f5fafa" : isDark ? "#110F0C" : "#f5fafa",
+      }}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
     </div>

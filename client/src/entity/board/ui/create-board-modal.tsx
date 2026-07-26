@@ -24,7 +24,7 @@ export const CreateBoardModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const { companyId: currentCompanyId } = useParams() as {
     companyId: string | undefined;
   };
-  const { mutate } = useCreateBoard();
+  const { mutate, isPending } = useCreateBoard();
   const router = useRouter();
 
   const {
@@ -32,7 +32,7 @@ export const CreateBoardModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     handleSubmit,
     setError,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
@@ -90,7 +90,7 @@ export const CreateBoardModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isPending}>
               Create
             </Button>
           </DialogFooter>

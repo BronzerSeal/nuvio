@@ -1,13 +1,5 @@
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
-import {
-  SquareTerminal,
-  Bot,
-  BookOpen,
-  Settings2,
-  Frame,
-  PieChart,
-  User,
-} from "lucide-react";
+import { BookOpen, Settings2, Frame, PieChart } from "lucide-react";
 
 export const DATA = {
   navMain: [

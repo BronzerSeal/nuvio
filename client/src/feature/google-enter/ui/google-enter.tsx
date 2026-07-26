@@ -21,9 +21,14 @@ export default function GoogleEnter({
   return (
     <div
       onClick={handleGoogleSignIn}
-      className="flex gap-1 text-[14px] font-semibold text-gray-700 items-center cursor-pointer w-full justify-center"
+      className="flex gap-1 text-[14px] font-semibold text-gray-700 dark:text-white items-center cursor-pointer w-full justify-center"
     >
-      <Image src={`/google.png`} width={23} height={23} alt="Google enter" />
+      <Image
+        src={`/google-transparent.png`}
+        width={23}
+        height={23}
+        alt="Google enter"
+      />
       <div>{text}</div>
     </div>
   );

@@ -22,7 +22,7 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
   isOpen,
   setIsOpen,
 }) => {
-  const { mutate } = useCreateTimelineRow();
+  const { mutate, isPending } = useCreateTimelineRow();
   const { timelineId } = useParams() as { timelineId: string | undefined };
 
   const {
@@ -30,7 +30,7 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
     handleSubmit,
     setError,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
@@ -81,7 +81,7 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isPending}>
               Create
             </Button>
           </DialogFooter>

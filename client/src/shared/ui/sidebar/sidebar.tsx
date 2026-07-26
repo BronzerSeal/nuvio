@@ -169,7 +169,6 @@ function Sidebar({
   ...props
 }: SidebarProps) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
-
   if (collapsible === "none") {
     return (
       <Highlight
@@ -214,12 +213,10 @@ function Sidebar({
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
           <Highlight
-            enabled={animateOnHover}
+            enabled={!isMobile && animateOnHover}
             hover
             controlledItems
             mode="parent"
-            containerClassName={cn("h-full", containerClassName)}
-            transition={transition}
           >
             <div className="flex h-full w-full flex-col">{children}</div>
           </Highlight>

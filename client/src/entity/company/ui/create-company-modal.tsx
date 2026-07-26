@@ -24,7 +24,7 @@ interface Props {
 }
 
 export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
-  const { mutate } = useJoinOrCreateCompany();
+  const { mutate, isPending } = useJoinOrCreateCompany();
   const router = useRouter();
 
   const {
@@ -34,7 +34,7 @@ export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     setValue,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
     defaultValues: {
@@ -125,7 +125,7 @@ export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isPending}>
               Create
             </Button>
           </DialogFooter>

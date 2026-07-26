@@ -32,10 +32,8 @@ const AddUserFrom = ({
 
   return (
     <div className="mt-3 space-y-2 px-2">
-      <Input placeholder="Email or name" {...register("userNameOrEmail")} />
-
-      <div className="flex justify-between">
-        <Button type="button">Invite</Button>
+      <div className="flex justify-between gap-1 mb-2">
+        <Input placeholder="Email or name" {...register("userNameOrEmail")} />
 
         <Button
           type="button"

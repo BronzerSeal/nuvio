@@ -7,7 +7,7 @@ import { Label } from "@/shared/ui/label";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getErrorMessage } from "@/shared/utils/get-error-msg";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useCreateTask } from "../queries/queries";
 import { DueCalendar } from "./due-calendar";
 import { PriorityOption, SelectPriority } from "./select-priority";
@@ -36,8 +36,7 @@ const priorities: PriorityOption[] = [
 export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const { boardId } = useParams() as { boardId: string | undefined };
   const { data: session } = authClient.useSession();
-  const { mutate } = useCreateTask();
-  const router = useRouter();
+  const { mutate, isPending } = useCreateTask();
 
   const {
     register,
@@ -45,7 +44,7 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     handleSubmit,
     setError,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
     defaultValues: {
@@ -79,7 +78,6 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
       },
     });
   };
-
   return (
     <Modal
       open={isOpen}
@@ -139,7 +137,7 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
             <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isPending}>
               Create
             </Button>
           </DialogFooter>

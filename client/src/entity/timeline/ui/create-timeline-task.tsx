@@ -28,7 +28,7 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
   isOpen,
   setIsOpen,
 }) => {
-  const { mutate } = useCreateTimelineTask();
+  const { mutate, isPending } = useCreateTimelineTask();
   const { timelineId } = useParams() as { timelineId: string | undefined };
   const { data: timelineRows } = useTimelineRows(timelineId!, !!timelineId);
 
@@ -38,7 +38,7 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
     setError,
     reset,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
     defaultValues: {
@@ -98,7 +98,7 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
                 })}
               />
               <div className="flex flex-row gap-2 ">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 flex-1">
                   <Label htmlFor="row-name">start time</Label>
                   <Input
                     id="row-name"
@@ -154,7 +154,7 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
                 <Button variant="outline" onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isPending}>
                   Create
                 </Button>
               </div>
