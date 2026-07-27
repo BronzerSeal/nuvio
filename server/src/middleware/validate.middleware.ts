@@ -32,7 +32,14 @@ export const validate =
         );
       }
 
-      req[key] = result.data;
+      if (key === "query") {
+        Object.defineProperty(req, key, {
+          value: result.data,
+          writable: true,
+        });
+      } else {
+        req[key] = result.data;
+      }
     }
 
     next();

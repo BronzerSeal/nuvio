@@ -9,6 +9,8 @@ import { taskService } from "../services/task.service.js";
 
 type CreateTaskRequest = Request<{}, {}, CreateTaskDto>;
 
+type UpdateTaskRequest = Request<UpdateTaskParamsDto, {}, UpdateTaskDto>;
+
 const newTask = async (req: CreateTaskRequest, res: Response) => {
   const task = await taskService.createTask({
     userId: req.user.id,
@@ -19,8 +21,6 @@ const newTask = async (req: CreateTaskRequest, res: Response) => {
 
   return res.status(201).json(task);
 };
-
-type UpdateTaskRequest = Request<UpdateTaskParamsDto, {}, UpdateTaskDto>;
 
 const updateTask = async (req: UpdateTaskRequest, res: Response) => {
   const { taskId } = req.params;
