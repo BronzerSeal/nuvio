@@ -2,11 +2,22 @@ import { NextFunction, Request, Response } from "express";
 import { CustomError } from "../errors/CustomError.js";
 
 export const errorHandler = (
-  err: Error,
+  err: Error & { type?: string },
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  // invalid JSON
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({
+      errors: [
+        {
+          message: "Invalid JSON",
+        },
+      ],
+    });
+  }
+
   // Handled errors
   if (err instanceof CustomError) {
     console.error(
