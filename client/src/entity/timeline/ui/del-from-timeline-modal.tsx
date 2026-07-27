@@ -93,74 +93,73 @@ export const DelFromTimelineModal: React.FC<Props> = ({
       open={isOpen}
       onClose={() => setIsOpen(false)}
       title="Delete something"
-      children={
-        <form
-          onSubmit={handleSubmit(handleDeleteRow)}
-          className="flex flex-col gap-4"
-        >
-          <div className="flex flex-col gap-2">
-            <Label>Rows</Label>
-            <Controller
-              name="rowsId"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  className="max-w-full"
-                  placeholder={
-                    field.value == undefined || field.value?.length == 0
-                      ? "select rows..."
-                      : ""
-                  }
-                  items={timelineRows ?? []}
-                  value={field.value ?? []}
-                  onValueChange={field.onChange}
-                />
-              )}
-            />
-          </div>
+    >
+      <form
+        onSubmit={handleSubmit(handleDeleteRow)}
+        className="flex flex-col gap-4"
+      >
+        <div className="flex flex-col gap-2">
+          <Label>Rows</Label>
+          <Controller
+            name="rowsId"
+            control={control}
+            render={({ field }) => (
+              <MultiSelect
+                className="max-w-full"
+                placeholder={
+                  field.value == undefined || field.value?.length == 0
+                    ? "select rows..."
+                    : ""
+                }
+                items={timelineRows ?? []}
+                value={field.value ?? []}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
+        </div>
 
-          <div className="flex flex-col gap-2">
-            <Label>Tasks</Label>
-            <Controller
-              name="tasksId"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  className="max-w-full"
-                  placeholder={
-                    field.value == undefined || field.value?.length == 0
-                      ? "select tasks..."
-                      : ""
-                  }
-                  items={timelineTasks ?? []}
-                  value={field.value ?? []}
-                  onValueChange={field.onChange}
-                />
-              )}
-            />
-          </div>
+        <div className="flex flex-col gap-2">
+          <Label>Tasks</Label>
+          <Controller
+            name="tasksId"
+            control={control}
+            render={({ field }) => (
+              <MultiSelect
+                className="max-w-full"
+                placeholder={
+                  field.value == undefined || field.value?.length == 0
+                    ? "select tasks..."
+                    : ""
+                }
+                items={timelineTasks ?? []}
+                value={field.value ?? []}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
+        </div>
 
-          <DialogFooter>
-            <div className="flex w-full items-center">
-              <ErrorMsg error={errors.root?.message} />
+        <DialogFooter>
+          <div className="flex w-full items-center">
+            <ErrorMsg error={errors.root?.message} />
 
-              <div className="ml-auto flex gap-2">
-                <Button variant="outline" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </Button>
-                <FrameButton
-                  type="submit"
-                  disabled={isDelRowPending || isDelTaskPending}
-                  variant="outline"
-                  className="text-[10px] size-1"
-                >
-                  Delete
-                </FrameButton>
-              </div>
+            <div className="ml-auto flex gap-2">
+              <Button variant="outline" onClick={() => setIsOpen(false)}>
+                Cancel
+              </Button>
+              <FrameButton
+                type="submit"
+                disabled={isDelRowPending || isDelTaskPending}
+                variant="outline"
+                className="text-[10px] size-1"
+              >
+                Delete
+              </FrameButton>
             </div>
-          </DialogFooter>
-        </form>
-      }
-    />
+          </div>
+        </DialogFooter>
+      </form>
+    </Modal>
   );
 };

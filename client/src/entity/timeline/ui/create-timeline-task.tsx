@@ -80,88 +80,83 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
   };
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
-      title="New task"
-      children={
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <div className="grid gap-2">
-              <Label htmlFor="row-name">name</Label>
-              <Input
-                id="row-name"
-                placeholder="frontend"
-                required
-                {...register("taskName", {
-                  required: "task name is required",
-                })}
-              />
-              <div className="flex flex-row gap-2 ">
-                <div className="flex flex-col gap-1 flex-1">
-                  <Label htmlFor="row-name">start time</Label>
-                  <Input
-                    id="row-name"
-                    type="time"
-                    required
-                    placeholder="00:00"
-                    {...register("startTime", {
-                      required: "start time is required",
-                    })}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1 w-full">
-                  <Label htmlFor="row-name">duration</Label>
-                  <Input
-                    id="row-name"
-                    placeholder="60"
-                    type="number"
-                    required
-                    {...register("duration", {
-                      required: "duration is required",
-                    })}
-                  />
-                </div>
+    <Modal open={isOpen} onClose={() => setIsOpen(false)} title="New task">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <div className="grid gap-2">
+            <Label htmlFor="row-name">name</Label>
+            <Input
+              id="row-name"
+              placeholder="frontend"
+              required
+              {...register("taskName", {
+                required: "task name is required",
+              })}
+            />
+            <div className="flex flex-row gap-2 ">
+              <div className="flex flex-col gap-1 flex-1">
+                <Label htmlFor="row-name">start time</Label>
+                <Input
+                  id="row-name"
+                  type="time"
+                  required
+                  placeholder="00:00"
+                  {...register("startTime", {
+                    required: "start time is required",
+                  })}
+                />
               </div>
 
-              <Controller
-                name="type"
-                control={control}
-                render={({ field }) => (
-                  <SelectType onChange={field.onChange} value={field.value} />
-                )}
-              />
+              <div className="flex flex-col gap-1 w-full">
+                <Label htmlFor="row-name">duration</Label>
+                <Input
+                  id="row-name"
+                  placeholder="60"
+                  type="number"
+                  required
+                  {...register("duration", {
+                    required: "duration is required",
+                  })}
+                />
+              </div>
+            </div>
 
-              <Controller
-                name="rowId"
-                control={control}
-                render={({ field }) => (
-                  <SelectRow
-                    onChange={field.onChange}
-                    value={field.value}
-                    rows={timelineRows}
-                  />
-                )}
-              />
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <SelectType onChange={field.onChange} value={field.value} />
+              )}
+            />
+
+            <Controller
+              name="rowId"
+              control={control}
+              render={({ field }) => (
+                <SelectRow
+                  onChange={field.onChange}
+                  value={field.value}
+                  rows={timelineRows}
+                />
+              )}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <div className="flex w-full items-center">
+            <ErrorMsg error={errors.root?.message} />
+
+            <div className="ml-auto flex gap-2">
+              <Button variant="outline" onClick={() => setIsOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                Create
+              </Button>
             </div>
           </div>
-          <DialogFooter>
-            <div className="flex w-full items-center">
-              <ErrorMsg error={errors.root?.message} />
-
-              <div className="ml-auto flex gap-2">
-                <Button variant="outline" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  Create
-                </Button>
-              </div>
-            </div>
-          </DialogFooter>
-        </form>
-      }
-    />
+        </DialogFooter>
+      </form>
+    </Modal>
   );
 };

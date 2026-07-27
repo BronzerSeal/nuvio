@@ -84,65 +84,64 @@ export const CreateTaskModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
       onClose={() => setIsOpen(false)}
       title="Create task"
       description="Describe your task specifically"
-      children={
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="name-1">task</Label>
-              <Input
-                id="name-1"
-                placeholder="fix bug"
-                required
-                {...register("taskName", {
-                  required: "task name is required",
-                })}
-              />
+    >
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid gap-4">
+          <div className="grid gap-3">
+            <Label htmlFor="name-1">task</Label>
+            <Input
+              id="name-1"
+              placeholder="fix bug"
+              required
+              {...register("taskName", {
+                required: "task name is required",
+              })}
+            />
 
-              <ErrorMsg error={errors.root?.message} />
-            </div>
-            <div className="flex flex-col gap-2 md:flex-row md:items-center">
+            <ErrorMsg error={errors.root?.message} />
+          </div>
+          <div className="flex flex-col gap-2 md:flex-row md:items-center">
+            <Controller
+              name="dueDate"
+              control={control}
+              render={({ field }) => (
+                <DueCalendar onChange={field.onChange} value={field.value} />
+              )}
+            />
+
+            <div className="flex items-center gap-2 w-full ">
               <Controller
-                name="dueDate"
+                name="priority"
                 control={control}
                 render={({ field }) => (
-                  <DueCalendar onChange={field.onChange} value={field.value} />
+                  <SelectPriority
+                    onChange={field.onChange}
+                    options={priorities}
+                  />
                 )}
               />
 
-              <div className="flex items-center gap-2 w-full ">
-                <Controller
-                  name="priority"
-                  control={control}
-                  render={({ field }) => (
-                    <SelectPriority
-                      onChange={field.onChange}
-                      options={priorities}
-                    />
-                  )}
+              <Avatar>
+                <AvatarImage
+                  src={session?.user.image || undefined}
+                  alt="user-avatar"
                 />
-
-                <Avatar>
-                  <AvatarImage
-                    src={session?.user.image || undefined}
-                    alt="user-avatar"
-                  />
-                  <AvatarFallback>
-                    {session?.user.name.slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+                <AvatarFallback>
+                  {session?.user.name.slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              Create
-            </Button>
-          </DialogFooter>
-        </form>
-      }
-    />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isPending}>
+            Create
+          </Button>
+        </DialogFooter>
+      </form>
+    </Modal>
   );
 };

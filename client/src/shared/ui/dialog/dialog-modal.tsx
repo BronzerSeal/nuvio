@@ -2,7 +2,6 @@ import {
   Dialog,
   DialogPanel,
   DialogHeader,
-  DialogFooter,
   DialogTitle,
   DialogDescription,
 } from "./dialog-headless";
