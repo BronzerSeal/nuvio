@@ -12,6 +12,8 @@ import { createServer } from "node:http";
 import "dotenv/config";
 import { registerSockets } from "./sockets/index.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import swaggerUi from "swagger-ui-express";
+import { openapi } from "./docs/openapi.js";
 
 const app = express();
 const server = createServer(app);
@@ -29,6 +31,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapi));
 
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 
