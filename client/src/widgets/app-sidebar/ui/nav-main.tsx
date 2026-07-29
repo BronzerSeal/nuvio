@@ -78,7 +78,9 @@ const NavMain = () => {
           </Collapsible>
         ))}
 
+        {/* Layer path  */}
         <LayerCollapsible />
+        {/* members */}
         <MemberDrawer />
       </SidebarMenu>
 

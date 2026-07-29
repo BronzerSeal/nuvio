@@ -15,4 +15,7 @@ export const SITE_ENDPOINTS = {
 
   timeline: (companyId: string, timelineId: string) =>
     `${SITE_URL}/dashboard/${companyId}/timeline/${timelineId}`,
+
+  availability: (companyId: string) =>
+    `${SITE_URL}/dashboard/${companyId}/availability`,
 };

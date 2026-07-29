@@ -49,7 +49,15 @@ export const DelFromTimelineModal: React.FC<Props> = ({
   const handleDeleteRow = async (data: IFormInput) => {
     if (!timelineId) return;
 
-    if (data.rowsId?.length) {
+    const hasRows = data.rowsId?.length;
+    const hasTasks = data.tasksId?.length;
+
+    if (!hasRows && !hasTasks) return;
+
+    reset();
+    setIsOpen(false);
+
+    if (hasRows) {
       const sendData = {
         timelineId,
         rowIds: data.rowsId,
@@ -61,14 +69,10 @@ export const DelFromTimelineModal: React.FC<Props> = ({
             message: getErrorMessage(error),
           });
         },
-        onSuccess: () => {
-          reset();
-          setIsOpen(false);
-        },
       });
     }
 
-    if (data.tasksId?.length) {
+    if (hasTasks) {
       const sendData = {
         timelineId,
         taskIds: data.tasksId,
@@ -79,10 +83,6 @@ export const DelFromTimelineModal: React.FC<Props> = ({
             type: "server",
             message: getErrorMessage(error),
           });
-        },
-        onSuccess: () => {
-          reset();
-          setIsOpen(false);
         },
       });
     }

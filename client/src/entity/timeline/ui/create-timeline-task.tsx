@@ -53,9 +53,14 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
         type: "client",
         message: "Choose row",
       });
+      return;
     }
 
     if (!timelineId) return;
+
+    reset();
+    setIsOpen(false);
+
     const sendData = {
       timelineId,
       rowId: data.rowId,
@@ -65,16 +70,13 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
       type: data.type,
       attendees: 1,
     };
+
     mutate(sendData, {
       onError: (error) => {
         setError("root", {
           type: "server",
           message: getErrorMessage(error),
         });
-      },
-      onSuccess: () => {
-        reset();
-        setIsOpen(false);
       },
     });
   };

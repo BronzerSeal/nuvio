@@ -34,6 +34,10 @@ app.use(
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapi));
 
+app.get("/docs-json", (_req, res) => {
+  res.json(openapi);
+});
+
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 app.use(express.json());

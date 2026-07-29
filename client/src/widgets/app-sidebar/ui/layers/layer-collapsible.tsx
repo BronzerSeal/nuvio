@@ -22,6 +22,23 @@ const LayerCollapsible = () => {
     !!companyId,
   );
   // console.log(timeline);
+
+  const items = [
+    timeline && companyId
+      ? {
+          title: "Timeline",
+          href: SITE_ENDPOINTS.timeline(companyId, timeline.id),
+        }
+      : null,
+
+    companyId
+      ? {
+          title: "Availability",
+          href: SITE_ENDPOINTS.availability(companyId),
+        }
+      : null,
+  ].filter((item): item is NonNullable<typeof item> => item !== null);
+
   return (
     <Collapsible asChild className="group/collapsible">
       <SidebarMenuItem>
@@ -41,15 +58,13 @@ const LayerCollapsible = () => {
               {isTimelineLoading ? (
                 <p>Loading</p>
               ) : (
-                <SidebarMenuSubButton asChild>
-                  {companyId && timeline ? (
-                    <a href={SITE_ENDPOINTS.timeline(companyId, timeline?.id)}>
-                      <span>Timeline</span>
+                items.map((item) => (
+                  <SidebarMenuSubButton key={item.href} asChild>
+                    <a href={item.href}>
+                      <span>{item.title}</span>
                     </a>
-                  ) : (
-                    <p>No company</p>
-                  )}
-                </SidebarMenuSubButton>
+                  </SidebarMenuSubButton>
+                ))
               )}
             </SidebarMenuSubItem>
             {/* ))} */}

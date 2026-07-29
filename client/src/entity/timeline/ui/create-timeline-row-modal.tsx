@@ -37,20 +37,21 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
 
   const onSubmit = async (data: IFormInput) => {
     if (!timelineId) return;
+
+    reset();
+    setIsOpen(false);
+
     const sendData = {
       timelineId,
       rowName: data.rowName,
     };
+
     mutate(sendData, {
       onError: (error) => {
         setError("root", {
           type: "server",
           message: getErrorMessage(error),
         });
-      },
-      onSuccess: () => {
-        reset();
-        setIsOpen(false);
       },
     });
   };
