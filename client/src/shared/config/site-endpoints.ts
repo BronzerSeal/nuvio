@@ -3,6 +3,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL!;
 export const SITE_ENDPOINTS = {
   dashboards: `${SITE_URL}/dashboard`,
   loginAndReg: `${SITE_URL}/`,
+  account: `${SITE_URL}/account`,
+
+  company: (companyId: string) => `${SITE_URL}/dashboard/${companyId}`,
 
   companyBoards: (companyId: string) =>
     `${SITE_URL}/dashboard/${companyId}/boards`,
@@ -12,4 +15,7 @@ export const SITE_ENDPOINTS = {
 
   timeline: (companyId: string, timelineId: string) =>
     `${SITE_URL}/dashboard/${companyId}/timeline/${timelineId}`,
+
+  availability: (companyId: string, availabilityId: string) =>
+    `${SITE_URL}/dashboard/${companyId}/availability/${availabilityId}`,
 };

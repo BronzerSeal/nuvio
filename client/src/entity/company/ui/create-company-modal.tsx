@@ -24,7 +24,7 @@ interface Props {
 }
 
 export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
-  const { mutate } = useJoinOrCreateCompany();
+  const { mutate, isPending } = useJoinOrCreateCompany();
   const router = useRouter();
 
   const {
@@ -34,7 +34,7 @@ export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     setValue,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
     defaultValues: {
@@ -72,65 +72,64 @@ export const CreateCompanyModal: React.FC<Props> = ({ isOpen, setIsOpen }) => {
       onClose={() => setIsOpen(false)}
       title="Create or Join Company"
       description="New company or already created?"
-      children={
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <div className="grid gap-3">
-              <Label htmlFor="name-1">Company name</Label>
-              <Input
-                id="name-1"
-                placeholder="Pixel"
-                required
-                {...register("companyName", {
-                  required: "company name is required",
-                })}
-              />
+    >
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <div className="grid gap-3">
+            <Label htmlFor="name-1">Company name</Label>
+            <Input
+              id="name-1"
+              placeholder="Pixel"
+              required
+              {...register("companyName", {
+                required: "company name is required",
+              })}
+            />
 
-              <Label htmlFor="name-1">Company description</Label>
-              <Input
-                id="name-1"
-                placeholder="Pixel"
-                {...register("companyDescription")}
-              />
+            <Label htmlFor="name-1">Company description</Label>
+            <Input
+              id="name-1"
+              placeholder="Pixel"
+              {...register("companyDescription")}
+            />
 
-              <Label>Choose Company Logo</Label>
-              <div className="flex flex-wrap gap-3">
-                {Object.entries(COMPANY_ICONS).map(([key, Icon]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() =>
-                      setValue("companyLogo", key as CompanyIcon, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      })
-                    }
-                    className={cn(
-                      "cursor-pointer rounded-sm border p-3 transition-all",
-                      "hover:bg-muted",
-                      selectedLogo === key
-                        ? "border-primary ring-2 ring-primary/20 bg-muted"
-                        : "border-border",
-                    )}
-                  >
-                    <Icon className="size-5" />
-                  </button>
-                ))}
-              </div>
-
-              <ErrorMsg error={errors.root?.message} />
+            <Label>Choose Company Logo</Label>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(COMPANY_ICONS).map(([key, Icon]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() =>
+                    setValue("companyLogo", key as CompanyIcon, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                  className={cn(
+                    "cursor-pointer rounded-sm border p-3 transition-all",
+                    "hover:bg-muted",
+                    selectedLogo === key
+                      ? "border-primary ring-2 ring-primary/20 bg-muted"
+                      : "border-border",
+                  )}
+                >
+                  <Icon className="size-5" />
+                </button>
+              ))}
             </div>
+
+            <ErrorMsg error={errors.root?.message} />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              Create
-            </Button>
-          </DialogFooter>
-        </form>
-      }
-    />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isPending}>
+            Create
+          </Button>
+        </DialogFooter>
+      </form>
+    </Modal>
   );
 };

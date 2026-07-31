@@ -20,7 +20,6 @@ import React from "react";
 import { CreateBoardModal } from "@/entity/board/ui/create-board-modal";
 import { MemberDrawer } from "./drawer/member-drawer";
 import LayerCollapsible from "./layers/layer-collapsible";
-
 const NavMain = () => {
   const [isNewBoardOpen, setIsNewBoardOpen] = React.useState(false);
   return (
@@ -79,7 +78,9 @@ const NavMain = () => {
           </Collapsible>
         ))}
 
+        {/* Layer path  */}
         <LayerCollapsible />
+        {/* members */}
         <MemberDrawer />
       </SidebarMenu>
 

@@ -28,8 +28,10 @@ export const DelFromTimelineModal: React.FC<Props> = ({
   isOpen,
   setIsOpen,
 }) => {
-  const { mutate: deleteTimelineRows } = useDeleteTimelineRows();
-  const { mutate: deleteTimelineTasks } = useDeleteTimelineTasks();
+  const { mutate: deleteTimelineRows, isPending: isDelRowPending } =
+    useDeleteTimelineRows();
+  const { mutate: deleteTimelineTasks, isPending: isDelTaskPending } =
+    useDeleteTimelineTasks();
   const { timelineId } = useParams() as { timelineId: string | undefined };
   const { data: timelineRows } = useTimelineRows(timelineId!, !!timelineId);
   const { data: timelineTasks } = useTimelineTasks(timelineId!, !!timelineId);
@@ -39,7 +41,7 @@ export const DelFromTimelineModal: React.FC<Props> = ({
     setError,
     reset,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
@@ -47,7 +49,15 @@ export const DelFromTimelineModal: React.FC<Props> = ({
   const handleDeleteRow = async (data: IFormInput) => {
     if (!timelineId) return;
 
-    if (data.rowsId?.length) {
+    const hasRows = data.rowsId?.length;
+    const hasTasks = data.tasksId?.length;
+
+    if (!hasRows && !hasTasks) return;
+
+    reset();
+    setIsOpen(false);
+
+    if (hasRows) {
       const sendData = {
         timelineId,
         rowIds: data.rowsId,
@@ -59,14 +69,10 @@ export const DelFromTimelineModal: React.FC<Props> = ({
             message: getErrorMessage(error),
           });
         },
-        onSuccess: () => {
-          reset();
-          setIsOpen(false);
-        },
       });
     }
 
-    if (data.tasksId?.length) {
+    if (hasTasks) {
       const sendData = {
         timelineId,
         taskIds: data.tasksId,
@@ -78,10 +84,6 @@ export const DelFromTimelineModal: React.FC<Props> = ({
             message: getErrorMessage(error),
           });
         },
-        onSuccess: () => {
-          reset();
-          setIsOpen(false);
-        },
       });
     }
   };
@@ -91,66 +93,73 @@ export const DelFromTimelineModal: React.FC<Props> = ({
       open={isOpen}
       onClose={() => setIsOpen(false)}
       title="Delete something"
-      children={
-        <form
-          onSubmit={handleSubmit(handleDeleteRow)}
-          className="flex flex-col gap-4"
-        >
-          <div className="flex flex-col gap-2">
-            <Label>Rows</Label>
-            <Controller
-              name="rowsId"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  className="max-w-full"
-                  placeholder="select rows..."
-                  items={timelineRows ?? []}
-                  value={field.value ?? []}
-                  onValueChange={field.onChange}
-                />
-              )}
-            />
-          </div>
+    >
+      <form
+        onSubmit={handleSubmit(handleDeleteRow)}
+        className="flex flex-col gap-4"
+      >
+        <div className="flex flex-col gap-2">
+          <Label>Rows</Label>
+          <Controller
+            name="rowsId"
+            control={control}
+            render={({ field }) => (
+              <MultiSelect
+                className="max-w-full"
+                placeholder={
+                  field.value == undefined || field.value?.length == 0
+                    ? "select rows..."
+                    : ""
+                }
+                items={timelineRows ?? []}
+                value={field.value ?? []}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
+        </div>
 
-          <div className="flex flex-col gap-2">
-            <Label>Tasks</Label>
-            <Controller
-              name="tasksId"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  className="max-w-full"
-                  placeholder="select tasks..."
-                  items={timelineTasks ?? []}
-                  value={field.value ?? []}
-                  onValueChange={field.onChange}
-                />
-              )}
-            />
-          </div>
+        <div className="flex flex-col gap-2">
+          <Label>Tasks</Label>
+          <Controller
+            name="tasksId"
+            control={control}
+            render={({ field }) => (
+              <MultiSelect
+                className="max-w-full"
+                placeholder={
+                  field.value == undefined || field.value?.length == 0
+                    ? "select tasks..."
+                    : ""
+                }
+                items={timelineTasks ?? []}
+                value={field.value ?? []}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
+        </div>
 
-          <DialogFooter>
-            <div className="flex w-full items-center">
-              <ErrorMsg error={errors.root?.message} />
+        <DialogFooter>
+          <div className="flex w-full items-center">
+            <ErrorMsg error={errors.root?.message} />
 
-              <div className="ml-auto flex gap-2">
-                <Button variant="outline" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </Button>
-                <FrameButton
-                  type="submit"
-                  disabled={isSubmitting}
-                  variant="outline"
-                  className="text-[10px] size-1"
-                >
-                  Delete
-                </FrameButton>
-              </div>
+            <div className="ml-auto flex gap-2">
+              <Button variant="outline" onClick={() => setIsOpen(false)}>
+                Cancel
+              </Button>
+              <FrameButton
+                type="submit"
+                disabled={isDelRowPending || isDelTaskPending}
+                variant="outline"
+                className="text-[10px] size-1"
+              >
+                Delete
+              </FrameButton>
             </div>
-          </DialogFooter>
-        </form>
-      }
-    />
+          </div>
+        </DialogFooter>
+      </form>
+    </Modal>
   );
 };

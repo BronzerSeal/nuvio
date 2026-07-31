@@ -1,5 +1,5 @@
 import { TimelineRow } from "@/shared/types/bd-types";
-import { Badge, BadgeProps } from "@shared/ui/badge";
+import { Badge } from "@shared/ui/badge";
 
 import { Field } from "@shared/ui/field";
 import {

@@ -7,10 +7,14 @@ import companyRouter from "./routes/company.routes.js";
 import userRouter from "./routes/user.routes.js";
 import taskRouter from "./routes/task.routes.js";
 import timelineRouter from "./routes/timeline.route.js";
+import availabilityRouter from "./routes/availability.routes.js";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
 import "dotenv/config";
 import { registerSockets } from "./sockets/index.js";
+import { errorHandler } from "./middleware/error.middleware.js";
+import swaggerUi from "swagger-ui-express";
+import { openapi } from "./docs/openapi.js";
 
 const app = express();
 const server = createServer(app);
@@ -29,6 +33,12 @@ app.use(
   }),
 );
 
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapi));
+
+app.get("/docs-json", (_req, res) => {
+  res.json(openapi);
+});
+
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 app.use(express.json());
@@ -38,6 +48,10 @@ app.use("/api/company", companyRouter);
 app.use("/api/user", userRouter);
 app.use("/api/task", taskRouter);
 app.use("/api/timeline", timelineRouter);
+app.use("/api/availability", availabilityRouter);
+
+//ERRORS
+app.use(errorHandler);
 
 //WEBSOCKETS
 registerSockets(io);

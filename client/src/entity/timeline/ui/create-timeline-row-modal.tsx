@@ -22,7 +22,7 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
   isOpen,
   setIsOpen,
 }) => {
-  const { mutate } = useCreateTimelineRow();
+  const { mutate, isPending } = useCreateTimelineRow();
   const { timelineId } = useParams() as { timelineId: string | undefined };
 
   const {
@@ -30,17 +30,22 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
     handleSubmit,
     setError,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<IFormInput>({
     mode: "onSubmit",
   });
 
   const onSubmit = async (data: IFormInput) => {
     if (!timelineId) return;
+
+    reset();
+    setIsOpen(false);
+
     const sendData = {
       timelineId,
       rowName: data.rowName,
     };
+
     mutate(sendData, {
       onError: (error) => {
         setError("root", {
@@ -48,45 +53,36 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
           message: getErrorMessage(error),
         });
       },
-      onSuccess: () => {
-        reset();
-        setIsOpen(false);
-      },
     });
   };
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
-      title="New table row"
-      children={
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <div className="grid gap-3">
-              <Label htmlFor="row-name">name</Label>
-              <Input
-                id="row-name"
-                placeholder="frontend"
-                required
-                {...register("rowName", {
-                  required: "row name is required",
-                })}
-              />
+    <Modal open={isOpen} onClose={() => setIsOpen(false)} title="New table row">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <div className="grid gap-3">
+            <Label htmlFor="row-name">name</Label>
+            <Input
+              id="row-name"
+              placeholder="frontend"
+              required
+              {...register("rowName", {
+                required: "row name is required",
+              })}
+            />
 
-              <ErrorMsg error={errors.root?.message} />
-            </div>
+            <ErrorMsg error={errors.root?.message} />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              Create
-            </Button>
-          </DialogFooter>
-        </form>
-      }
-    />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isPending}>
+            Create
+          </Button>
+        </DialogFooter>
+      </form>
+    </Modal>
   );
 };

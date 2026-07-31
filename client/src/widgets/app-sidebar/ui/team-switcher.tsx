@@ -23,23 +23,18 @@ import {
 import { TeamSwitcherSkeleton } from "./team-switcher-skeleton";
 import { useParams, useRouter } from "next/navigation";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
+import { useTheme } from "next-themes";
 
 const TeamSwitcher = () => {
   const isMobile = useIsMobile();
   const params = useParams();
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const { data: companies, isLoading } = useUserCompanies();
 
   const activeTeamId = params.companyId as string | undefined;
-
-  React.useEffect(() => {
-    if (!companies?.length) return;
-
-    if (!activeTeamId) {
-      router.replace(SITE_ENDPOINTS.companyBoards(companies[0].id));
-    }
-  }, [companies, activeTeamId, router]);
 
   const activeTeam = React.useMemo(() => {
     return companies?.find((c) => c.id === activeTeamId) ?? null;
@@ -56,15 +51,16 @@ const TeamSwitcher = () => {
             className="flex items-center justify-center gap-2 cursor-pointer"
             onClick={() => setIsModalOpen((prev) => !prev)}
           >
-            <PlusIcon color="black" />
+            <PlusIcon color={isDark ? "white" : "black"} />
           </SidebarMenuButton>
         </SidebarMenuItem>
         <CreateCompanyModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       </SidebarMenu>
     );
-  if (isLoading || !activeTeam) return <TeamSwitcherSkeleton />;
 
-  const Icon = COMPANY_ICONS[activeTeam.logo];
+  if (isLoading) return <TeamSwitcherSkeleton />;
+
+  const Icon = COMPANY_ICONS[activeTeam?.logo ?? "gallery"];
   return (
     <>
       <SidebarMenu>
@@ -81,9 +77,11 @@ const TeamSwitcher = () => {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {activeTeam.name}
+                    {activeTeam?.name ?? "?"}
                   </span>
-                  <span className="truncate text-xs">{activeTeam.plan}</span>
+                  <span className="truncate text-xs">
+                    {activeTeam?.plan ?? ""}
+                  </span>
                 </div>
                 <ChevronsUpDown className="ml-auto" />
               </SidebarMenuButton>

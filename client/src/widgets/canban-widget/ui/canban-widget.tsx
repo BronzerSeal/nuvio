@@ -90,7 +90,7 @@ export default function BoardWidget({
       }}
       getItemValue={(item) => item.id}
     >
-      <KanbanBoard className="grid auto-rows-fr  grid-cols-1 md:grid-cols-3">
+      <KanbanBoard className=" flex flex-col md:grid md:grid-cols-3 ">
         {Object.entries(columns).map(([columnValue, tasks]) => (
           <TaskColumn key={columnValue} value={columnValue} tasks={tasks} />
         ))}

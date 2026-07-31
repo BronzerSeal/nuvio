@@ -7,6 +7,8 @@ export const SERVER_ENDPOINTS = {
       `/company/${companyId}/memberships`,
 
     companyTimeline: (companyId: string) => `/company/${companyId}/timeline`,
+    companyAvailability: (companyId: string) =>
+      `/company/${companyId}/availability`,
   },
   user: {
     getMemberships: "user/me/companies",
@@ -38,5 +40,15 @@ export const SERVER_ENDPOINTS = {
 
     updateTask: (timelineId: string, taskId: string) =>
       `/timeline/${timelineId}/tasks/${taskId}`,
+  },
+  availability: {
+    getTimeSpans: (availabilityId: string) =>
+      `/availability/${availabilityId}/timeSpans`,
+    createTimeSpan: (availabilityId: string) =>
+      `/availability/${availabilityId}/timeSpans`,
+    updateTimeSpan: (availabilityId: string, timeSpanId: string) =>
+      `/availability/${availabilityId}/timeSpans/${timeSpanId}`,
+    deleteTimeSpan: (availabilityId: string, timeSpanId: string) =>
+      `/availability/${availabilityId}/timeSpans/${timeSpanId}`,
   },
 };

@@ -46,7 +46,8 @@ export function MemberDrawer() {
               <Button onClick={() => setShowForm(true)}>Add member</Button>
             </div>
           </DrawerHeader>
-          <div className="flex flex-col gap-1">
+
+          <div className="min-h-0 flex-1 overflow-y-auto">
             {showForm && (
               <AddUserFrom
                 onClose={() => {

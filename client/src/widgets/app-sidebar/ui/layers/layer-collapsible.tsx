@@ -1,3 +1,4 @@
+import { useCompanyAvailability } from "@/entity/availability";
 import { useCompanyTimeline } from "@/entity/timeline";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import {
@@ -21,7 +22,26 @@ const LayerCollapsible = () => {
     companyId!,
     !!companyId,
   );
+  const { data: availability, isLoading: isAvailabilityLoading } =
+    useCompanyAvailability(companyId!, !!companyId);
   // console.log(timeline);
+
+  const items = [
+    timeline && companyId
+      ? {
+          title: "Timeline",
+          href: SITE_ENDPOINTS.timeline(companyId, timeline.id),
+        }
+      : null,
+
+    availability && companyId
+      ? {
+          title: "Availability",
+          href: SITE_ENDPOINTS.availability(companyId, availability.id),
+        }
+      : null,
+  ].filter((item): item is NonNullable<typeof item> => item !== null);
+
   return (
     <Collapsible asChild className="group/collapsible">
       <SidebarMenuItem>
@@ -41,15 +61,13 @@ const LayerCollapsible = () => {
               {isTimelineLoading ? (
                 <p>Loading</p>
               ) : (
-                <SidebarMenuSubButton asChild>
-                  {companyId && timeline ? (
-                    <a href={SITE_ENDPOINTS.timeline(companyId, timeline?.id)}>
-                      <span>Timeline</span>
+                items.map((item) => (
+                  <SidebarMenuSubButton key={item.href} asChild>
+                    <a href={item.href}>
+                      <span>{item.title}</span>
                     </a>
-                  ) : (
-                    <p>No company</p>
-                  )}
-                </SidebarMenuSubButton>
+                  </SidebarMenuSubButton>
+                ))
               )}
             </SidebarMenuSubItem>
             {/* ))} */}

@@ -1,12 +1,5 @@
-import {
-  SquareTerminal,
-  Bot,
-  BookOpen,
-  Settings2,
-  Frame,
-  PieChart,
-  User,
-} from "lucide-react";
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
+import { BookOpen, Settings2, Frame, PieChart } from "lucide-react";
 
 export const DATA = {
   navMain: [
@@ -41,7 +34,7 @@ export const DATA = {
       items: [
         {
           title: "General",
-          url: "#",
+          url: `${SITE_ENDPOINTS.account}/settings`,
         },
         {
           title: "Team",

@@ -103,3 +103,18 @@ export type TimelineTask = {
   title: string;
   type: string;
 };
+
+//AVAILABILITY
+
+export interface TimeSpan {
+  active?: boolean;
+  id: string;
+  week_day: number; // 0-6 - Sunday-Saturday
+  start_time: string; // "HH:mm"
+  end_time: string; // "HH:mm"
+}
+
+export type Availability = {
+  companyId: string;
+  id: string;
+};

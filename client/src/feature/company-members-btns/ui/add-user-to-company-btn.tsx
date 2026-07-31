@@ -1,5 +1,5 @@
 "use client";
-import { useCreateCompanyMember } from "@/entity/company";
+import { useCreateCompanyMember } from "../queries/queries";
 import { LiquidButton } from "@/shared/ui/liquid-button";
 import { Plus } from "lucide-react";
 import { useParams } from "next/navigation";

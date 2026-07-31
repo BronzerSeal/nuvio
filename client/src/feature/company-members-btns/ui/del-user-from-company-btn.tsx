@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeleteCompanyMember } from "@/entity/company";
+import { useDeleteCompanyMember } from "../queries/queries";
 import { LiquidButton } from "@/shared/ui/liquid-button";
 import { LogOut } from "lucide-react";
 import { useParams } from "next/navigation";

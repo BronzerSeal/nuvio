@@ -1,3 +1,4 @@
+import { ForbiddenError } from "../errors/ForbiddenError.js";
 import prisma from "../lib/prisma.js";
 
 type Roles = "member" | "admin" | "owner";
@@ -15,7 +16,9 @@ export async function requireCompanyRole(
   });
 
   if (!member || !roles.includes(member.role)) {
-    throw new Error("NO_ACCESS");
+    throw new ForbiddenError({
+      message: "No access",
+    });
   }
 
   return member;

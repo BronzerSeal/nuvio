@@ -5,10 +5,25 @@ import { useParams } from "next/navigation";
 
 const SearchResults = ({ query }: { query: string }) => {
   const { companyId } = useParams() as { companyId: string | undefined };
-  const { data: users } = useFindUsers(query, companyId!, !!companyId);
+  const { data: users, isFetching } = useFindUsers(
+    query,
+    companyId!,
+    !!companyId,
+  );
 
+  if (!users && isFetching) return <p className="px-2">Loading...</p>;
   if (!users || users.length == 0) return <p className="px-2">no users</p>;
-  return users?.map((user) => <UserAddCard key={user.id} user={user} />);
+  return (
+    <>
+      {isFetching && (
+        <p className="px-2 text-sm text-muted-foreground">Updating...</p>
+      )}
+
+      {users.map((user) => (
+        <UserAddCard key={user.id} user={user} />
+      ))}
+    </>
+  );
 };
 
 export default SearchResults;

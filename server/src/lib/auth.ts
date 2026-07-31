@@ -39,4 +39,8 @@ export const auth = betterAuth({
       "https://nuvio.vercel.app/dashboard",
     ],
   },
+
+  onAPIError: {
+    errorURL: "/auth/error",
+  },
 });

@@ -9,21 +9,14 @@ import { Card } from "@shared/ui/card";
 import LoginForm from "./login-form";
 import RegisterPage from "./register-form";
 import ParticleConstellation from "@/shared/ui/particle-constellation-bg";
-import Image from "next/image";
+import { Logo } from "./logo";
 
 const EnterPage = () => {
   return (
     <div className="min-h-screen px-2  flex flex-col items-center justify-center">
       <ParticleConstellation className="absolute" />
 
-      <Image
-        src="/logo-text.png"
-        width={160}
-        height={100}
-        alt="Logo"
-        className="mb-2 z-10"
-        priority
-      />
+      <Logo />
 
       <div className="flex w-full max-w-sm flex-col z-10 ">
         <Tabs defaultValue="login">
