@@ -1,8 +1,12 @@
 "use client";
 
-import { TimeSpan } from "@/views/availability-page/ui/availability";
+import { useTimeSpans } from "@/entity/availability";
+import { socket } from "@/shared/api/websockets";
+import { queryClient } from "@/shared/lib/query-client";
 import dynamic from "next/dynamic";
+import { useParams } from "next/navigation";
 import React from "react";
+import AvailabilitySkeleton from "./availability-skeleton";
 
 const Availability = dynamic(
   () =>
@@ -15,29 +19,35 @@ const Availability = dynamic(
 );
 
 const AvailabilityPage = () => {
-  const [data, setData] = React.useState<TimeSpan[]>([
-    {
-      id: "1",
-      week_day: 1,
-      start_time: "09:00",
-      end_time: "12:00",
-      active: true,
-    },
-    {
-      id: "2",
-      week_day: 3,
-      start_time: "14:00",
-      end_time: "16:00",
-      active: true,
-    },
-    {
-      id: "3",
-      week_day: 5,
-      start_time: "10:00",
-      end_time: "11:30",
-      active: true,
-    },
-  ]);
+  const { availabilityId } = useParams() as {
+    availabilityId: string | undefined;
+  };
+  const { data: stamps, isLoading } = useTimeSpans(
+    availabilityId!,
+    !!availabilityId,
+  );
+  console.log(stamps);
+
+  //WEBSOCKETS
+  React.useEffect(() => {
+    socket.emit("join-availability", availabilityId);
+  }, [availabilityId]);
+
+  React.useEffect(() => {
+    socket.on("availability-updated", () => {
+      queryClient.invalidateQueries({
+        queryKey: ["availability-time-spans", availabilityId],
+      });
+    });
+
+    return () => {
+      socket.off("availability-updated");
+    };
+  }, []);
+
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
   return (
     <div className="w-full h-full p-2 bg-background border rounded-lg">
       <div className="mb-6">
@@ -48,12 +58,11 @@ const AvailabilityPage = () => {
           availability.
         </p>
       </div>
-      <Availability
-        value={data}
-        onValueChange={setData}
-        startTime={4}
-        endTime={24}
-      />
+      {isLoading ? (
+        <AvailabilitySkeleton />
+      ) : (
+        <Availability value={stamps} startTime={4} endTime={24} />
+      )}
     </div>
   );
 };

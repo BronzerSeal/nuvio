@@ -62,4 +62,14 @@ router.get(
   companyController.getTimeline,
 );
 
+//GET /company/:companyId/availability
+router.get(
+  "/:companyId/availability",
+  authMiddleware,
+  validate({
+    params: companyValidation.getAvailabilityParamsSchema,
+  }),
+  companyController.getAvailability,
+);
+
 export default router;

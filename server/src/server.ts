@@ -7,6 +7,7 @@ import companyRouter from "./routes/company.routes.js";
 import userRouter from "./routes/user.routes.js";
 import taskRouter from "./routes/task.routes.js";
 import timelineRouter from "./routes/timeline.route.js";
+import availabilityRouter from "./routes/availability.routes.js";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
 import "dotenv/config";
@@ -47,6 +48,7 @@ app.use("/api/company", companyRouter);
 app.use("/api/user", userRouter);
 app.use("/api/task", taskRouter);
 app.use("/api/timeline", timelineRouter);
+app.use("/api/availability", availabilityRouter);
 
 //ERRORS
 app.use(errorHandler);

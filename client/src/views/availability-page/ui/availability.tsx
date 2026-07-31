@@ -19,6 +19,12 @@ import {
 } from "@dnd-kit/core";
 import tunnel from "tunnel-rat";
 import { nanoid } from "nanoid";
+import { useParams } from "next/navigation";
+import {
+  useCreateTimeSpan,
+  useDeleteTimeSpan,
+  useUpdateTimeSpan,
+} from "@/entity/availability";
 
 // --- Types ---
 
@@ -319,6 +325,17 @@ export function Availability({
 
   const mainContainerRef = React.useRef<HTMLDivElement>(null);
 
+  //---------------------------------------------------------------
+  //SERVER
+  const { availabilityId } = useParams() as {
+    availabilityId: string | undefined;
+  };
+  const { mutate: createTimespan } = useCreateTimeSpan();
+  const { mutate: updateTimeSpan } = useUpdateTimeSpan();
+  const { mutate: deleteTimeSpan } = useDeleteTimeSpan();
+
+  //---------------------------------------------------------------
+
   // Determine which days to render
   const renderedDays = React.useMemo(() => {
     if (showAllDays) {
@@ -351,6 +368,14 @@ export function Availability({
       return span;
     });
     updateValue(newValue, isComplete);
+    if (availabilityId && isComplete) {
+      updateTimeSpan({
+        availabilityId,
+        timeSpanId: id,
+        start_time: newStart,
+        end_time: newEnd,
+      });
+    }
   };
 
   const handleCreate = (
@@ -365,7 +390,11 @@ export function Availability({
       end_time: minutesToTime(endMinutes),
       active: true,
     };
-    updateValue([...internalValue, newSpan], true);
+
+    // updateValue([...internalValue, newSpan], true);
+    //server
+    if (!availabilityId) return;
+    createTimespan({ ...newSpan, availabilityId: availabilityId });
   };
 
   const handleDelete = (id: string) => {
@@ -373,6 +402,12 @@ export function Availability({
       internalValue.filter((s) => s.id !== id),
       true,
     );
+    if (availabilityId) {
+      deleteTimeSpan({
+        availabilityId,
+        timeSpanId: id,
+      });
+    }
   };
 
   const handleMove = (
@@ -393,6 +428,15 @@ export function Availability({
       return span;
     });
     updateValue(newValue, true);
+    if (availabilityId) {
+      updateTimeSpan({
+        availabilityId,
+        timeSpanId: id,
+        start_time: newStart,
+        end_time: newEnd,
+        week_day: newDayIndex,
+      });
+    }
   };
 
   // Validation helper

@@ -37,6 +37,11 @@ type GetTimelineParams = {
   companyId: string;
 };
 
+type GetAvailabilityParams = {
+  userId: string;
+  companyId: string;
+};
+
 export const joinOrCreate = async ({
   companyName,
   description,
@@ -58,8 +63,14 @@ export const joinOrCreate = async ({
       },
     });
 
-    //COMPANY TIMELINE
+    //COMPANY TIMELINE && AVAILABILITY
     await prisma.timeline.create({
+      data: {
+        companyId: company.id,
+      },
+    });
+
+    await prisma.availability.create({
       data: {
         companyId: company.id,
       },
@@ -238,4 +249,23 @@ export const getTimeline = async ({ userId, companyId }: GetTimelineParams) => {
   }
 
   return timeline;
+};
+
+export const getAvailability = async ({
+  userId,
+  companyId,
+}: GetAvailabilityParams) => {
+  await requireCompanyRole(userId, companyId, ["owner", "admin", "member"]);
+
+  const availability = await prisma.availability.findUnique({
+    where: { companyId },
+  });
+
+  if (!availability) {
+    throw new NotFoundError({
+      message: "Availability not found",
+    });
+  }
+
+  return availability;
 };

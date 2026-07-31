@@ -34,6 +34,10 @@ export const getTimelineParamsSchema = z.object({
   companyId: z.string(),
 });
 
+export const getAvailabilityParamsSchema = z.object({
+  companyId: z.string(),
+});
+
 export type JoinOrCreateDto = z.infer<typeof joinOrCreateSchema>;
 
 export type GetCompanyMembersParamsDto = z.infer<
@@ -54,3 +58,6 @@ export type DeleteMemberParamsDto = z.infer<typeof deleteMemberParamsSchema>;
 export type DeleteMemberQueryDto = z.infer<typeof deleteMemberQuerySchema>;
 
 export type GetTimelineParamsDto = z.infer<typeof getTimelineParamsSchema>;
+export type GetAvailabilityParamsDto = z.infer<
+  typeof getAvailabilityParamsSchema
+>;

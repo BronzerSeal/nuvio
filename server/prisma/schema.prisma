@@ -88,6 +88,7 @@ model Company {
   members CompanyMember[]
   boards  Board[]
   timeline Timeline?
+  availability Availability?
 }
 
 enum CompanyRoles {
@@ -199,3 +200,24 @@ model TimelineTask {
   row           TimelineRow @relation(fields: [rowId], references: [id],onDelete: Cascade)
 }
   
+
+// Availability
+
+model Availability {
+  id          String          @id @default(cuid())
+  companyId   String          @unique()
+
+  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  timeSpans   TimeSpan[]
+}
+
+model TimeSpan {
+  id              String      @id @default(cuid())
+  availabilityId  String
+  weekDay         Int
+  startTime       String // "10:00"
+  endTime         String // "12:00"
+  active          Boolean
+
+  availability    Availability @relation(fields: [availabilityId],references: [id], onDelete: Cascade)
+}

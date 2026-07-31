@@ -1,3 +1,4 @@
+import { useCompanyAvailability } from "@/entity/availability";
 import { useCompanyTimeline } from "@/entity/timeline";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import {
@@ -21,6 +22,8 @@ const LayerCollapsible = () => {
     companyId!,
     !!companyId,
   );
+  const { data: availability, isLoading: isAvailabilityLoading } =
+    useCompanyAvailability(companyId!, !!companyId);
   // console.log(timeline);
 
   const items = [
@@ -31,10 +34,10 @@ const LayerCollapsible = () => {
         }
       : null,
 
-    companyId
+    availability && companyId
       ? {
           title: "Availability",
-          href: SITE_ENDPOINTS.availability(companyId),
+          href: SITE_ENDPOINTS.availability(companyId, availability.id),
         }
       : null,
   ].filter((item): item is NonNullable<typeof item> => item !== null);

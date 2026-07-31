@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { registerBoardSocket } from "./board.socket.js";
 import { registerTimelineSocket } from "./timeline.socket.js";
+import { registerAvailabilitySocket } from "./availability.socket.js";
 
 export const registerSockets = (io: Server) => {
   io.on("connection", (socket) => {
@@ -8,5 +9,6 @@ export const registerSockets = (io: Server) => {
 
     registerBoardSocket(io, socket);
     registerTimelineSocket(io, socket);
+    registerAvailabilitySocket(io, socket);
   });
 };

@@ -4,6 +4,7 @@ import {
   CreateMembershipParamsDto,
   DeleteMemberParamsDto,
   DeleteMemberQueryDto,
+  GetAvailabilityParamsDto,
   GetCompanyMembersParamsDto,
   GetCompanyMembersQueryDto,
   GetTimelineParamsDto,
@@ -14,6 +15,22 @@ import { companyService } from "../services/index.js";
 type joinOrCreateRequest = Request<{}, {}, JoinOrCreateDto>;
 
 type GetCompanyMembersRequest = Request<GetCompanyMembersParamsDto>;
+
+type CreateMembershipRequest = Request<
+  CreateMembershipParamsDto,
+  {},
+  CreateMembershipDto
+>;
+
+type DeleteMemberRequest = Request<
+  DeleteMemberParamsDto,
+  {},
+  {},
+  DeleteMemberQueryDto
+>;
+
+type GetTimelineRequest = Request<GetTimelineParamsDto>;
+type GetAvailabilityRequest = Request<GetAvailabilityParamsDto>;
 
 const joinOrCreate = async (req: joinOrCreateRequest, res: Response) => {
   const member = await companyService.joinOrCreate({
@@ -48,12 +65,6 @@ const getCompanyMembers = async (
   return res.status(200).json(result);
 };
 
-type CreateMembershipRequest = Request<
-  CreateMembershipParamsDto,
-  {},
-  CreateMembershipDto
->;
-
 const createMembership = async (
   req: CreateMembershipRequest,
   res: Response,
@@ -67,13 +78,6 @@ const createMembership = async (
   return res.status(201).json(member);
 };
 
-type DeleteMemberRequest = Request<
-  DeleteMemberParamsDto,
-  {},
-  {},
-  DeleteMemberQueryDto
->;
-
 const deleteMember = async (req: DeleteMemberRequest, res: Response) => {
   const member = await companyService.deleteMember({
     userId: req.user.id,
@@ -84,8 +88,6 @@ const deleteMember = async (req: DeleteMemberRequest, res: Response) => {
   return res.status(200).json(member);
 };
 
-type GetTimelineRequest = Request<GetTimelineParamsDto>;
-
 const getTimeline = async (req: GetTimelineRequest, res: Response) => {
   const timeline = await companyService.getTimeline({
     userId: req.user.id,
@@ -95,6 +97,15 @@ const getTimeline = async (req: GetTimelineRequest, res: Response) => {
   return res.status(200).json(timeline);
 };
 
+const getAvailability = async (req: GetAvailabilityRequest, res: Response) => {
+  const availability = await companyService.getAvailability({
+    userId: req.user.id,
+    companyId: req.params.companyId,
+  });
+
+  return res.status(200).json(availability);
+};
+
 export {
   joinOrCreate,
   userCompanies,
@@ -102,4 +113,5 @@ export {
   createMembership,
   deleteMember,
   getTimeline,
+  getAvailability,
 };
