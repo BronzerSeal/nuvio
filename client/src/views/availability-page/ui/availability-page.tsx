@@ -49,8 +49,12 @@ const AvailabilityPage = () => {
   //   return <div>Loading...</div>;
   // }
   return (
-    <div className="w-full h-full p-2 bg-background border rounded-lg">
-      <div className="mb-6">
+    <div className="w-full h-full p-2   rounded-lg">
+      {/* <div className="-z-10">
+        <BackgroundRippleEffect />
+      </div> */}
+
+      <div className="mb-6 z-20">
         <h1 className="text-2xl font-semibold tracking-tight">Availability</h1>
         <p className="text-sm text-muted-foreground">
           Configure weekly working hours and availability. These time slots can
