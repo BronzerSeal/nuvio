@@ -1,4 +1,4 @@
-import { BackgroundRippleEffect } from "@/components/background/BackgroundRippleEffect";
+import { BackgroundRippleEffect } from "@/shared/ui/ripple-effect-bg/BackgroundRippleEffect";
 import { MoveCompProvider } from "@/shared/providers/move-comp-provider";
 
 export default async function RootLayout({

@@ -1,29 +1,50 @@
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/shared/ui/collapsible";
-import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@/shared/ui/sidebar";
 
-import { ChevronRight, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { DATA } from "../consts/consts";
 import React from "react";
 import { CreateBoardModal } from "@/entity/board/ui/create-board-modal";
 import { MemberDrawer } from "./drawer/member-drawer";
-import LayerCollapsible from "./layers/layer-collapsible";
+import { useParams } from "next/navigation";
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 const NavMain = () => {
   const [isNewBoardOpen, setIsNewBoardOpen] = React.useState(false);
+  const { companyId } = useParams() as { companyId?: string };
+
+  if (!companyId) return <p>Loading</p>;
   return (
     <SidebarGroup>
+      {/* else */}
+      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarMenu>
+        {DATA.navMain.map((item) => (
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton asChild className="py-4">
+              <a
+                href={SITE_ENDPOINTS.company(companyId) + item.url}
+                className="flex w-full items-center"
+              >
+                {item.icon && <item.icon />}
+                <span>{item.title}</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+
+        {/* Layer path  */}
+        {/* <LayerCollapsible /> */}
+        {/* members */}
+        <MemberDrawer />
+      </SidebarMenu>
+
       {/* new board */}
       <SidebarMenuSubItem
         className="cursor-pointer"
@@ -36,54 +57,6 @@ const NavMain = () => {
           </div>
         </SidebarMenuSubButton>
       </SidebarMenuSubItem>
-
-      {/* else */}
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
-      <SidebarMenu>
-        {DATA.navMain.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton
-                  asChild
-                  className="w-full"
-                  tooltip={item.title}
-                >
-                  <div className="flex w-full items-center">
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                    <ChevronRight className="ml-auto transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90" />
-                  </div>
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
-
-        {/* Layer path  */}
-        <LayerCollapsible />
-        {/* members */}
-        <MemberDrawer />
-      </SidebarMenu>
-
       <CreateBoardModal isOpen={isNewBoardOpen} setIsOpen={setIsNewBoardOpen} />
     </SidebarGroup>
   );

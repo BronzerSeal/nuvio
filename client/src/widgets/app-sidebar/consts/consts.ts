@@ -1,71 +1,100 @@
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
-import { BookOpen, Settings2, Frame, PieChart } from "lucide-react";
+import {
+  Blocks,
+  ChartNoAxesColumn,
+  CalendarRange,
+  StickyNotes,
+} from "lucide-react";
 
 export const DATA = {
   navMain: [
     {
-      title: "Documentation",
+      title: "Dashboard",
       url: "#",
-      isActive: true,
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      // isActive: true,
+      icon: Blocks,
     },
     {
-      title: "Settings",
+      title: "Tasks",
       url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: `${SITE_ENDPOINTS.account}/settings`,
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      // isActive: true,
+      icon: StickyNotes,
     },
     {
-      name: "Sales & Marketing",
+      title: "Calendar",
       url: "#",
-      icon: PieChart,
+      // isActive: true,
+      icon: CalendarRange,
     },
     {
-      name: "Travel",
+      title: "Analytics",
       url: "#",
-      icon: Map,
+      // isActive: true,
+      icon: ChartNoAxesColumn,
     },
+    //   {
+    //     title: "Documentation",
+    //     url: "#",
+    //     isActive: true,
+    //     icon: BookOpen,
+    //     items: [
+    //       {
+    //         title: "Introduction",
+    //         url: "#",
+    //       },
+    //       {
+    //         title: "Get Started",
+    //         url: "#",
+    //       },
+    //       {
+    //         title: "Tutorials",
+    //         url: "#",
+    //       },
+    //       {
+    //         title: "Changelog",
+    //         url: "#",
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     title: "Settings",
+    //     url: "#",
+    //     icon: Settings2,
+    //     items: [
+    //       {
+    //         title: "General",
+    //         url: `${SITE_ENDPOINTS.account}/settings`,
+    //       },
+    //       {
+    //         title: "Team",
+    //         url: "#",
+    //       },
+    //       {
+    //         title: "Billing",
+    //         url: "#",
+    //       },
+    //       {
+    //         title: "Limits",
+    //         url: "#",
+    //       },
+    //     ],
+    //   },
+    // ],
+    // projects: [
+    //   {
+    //     name: "Design Engineering",
+    //     url: "#",
+    //     icon: Frame,
+    //   },
+    //   {
+    //     name: "Sales & Marketing",
+    //     url: "#",
+    //     icon: PieChart,
+    //   },
+    //   {
+    //     name: "Travel",
+    //     url: "#",
+    //     icon: Map,
+    //   },
   ],
 };
