@@ -55,6 +55,7 @@ export type Task = {
     id: string;
     image: string | undefined;
     name: string;
+    email: string;
   };
 
   createdAt: Date;

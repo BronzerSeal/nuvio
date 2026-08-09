@@ -52,6 +52,27 @@ router.delete(
   companyController.deleteMember,
 );
 
+// GET /company/:companyId/tasks
+router.get(
+  "/:companyId/tasks",
+  authMiddleware,
+  validate({
+    params: companyValidation.getTasksParamsSchema,
+    query: companyValidation.getTasksQuerySchema,
+  }),
+  companyController.getTasks,
+);
+
+// GET /company/:companyId/tasks-count
+router.get(
+  "/:companyId/tasks-count",
+  authMiddleware,
+  validate({
+    params: companyValidation.getTasksCountParamsSchema,
+  }),
+  companyController.getTasksCount,
+);
+
 //GET /company/:companyId/timeline
 router.get(
   "/:companyId/timeline",

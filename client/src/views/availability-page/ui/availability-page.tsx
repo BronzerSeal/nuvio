@@ -26,7 +26,6 @@ const AvailabilityPage = () => {
     availabilityId!,
     !!availabilityId,
   );
-  console.log(stamps);
 
   //WEBSOCKETS
   React.useEffect(() => {

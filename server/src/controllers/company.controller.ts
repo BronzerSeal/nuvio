@@ -7,6 +7,9 @@ import {
   GetAvailabilityParamsDto,
   GetCompanyMembersParamsDto,
   GetCompanyMembersQueryDto,
+  GetTasksCountParamsDto,
+  GetTasksParamsDto,
+  GetTasksQueryDto,
   GetTimelineParamsDto,
   JoinOrCreateDto,
 } from "../validate/company.validation.js";
@@ -31,6 +34,8 @@ type DeleteMemberRequest = Request<
 
 type GetTimelineRequest = Request<GetTimelineParamsDto>;
 type GetAvailabilityRequest = Request<GetAvailabilityParamsDto>;
+type GetTasksRequest = Request<GetTasksParamsDto>;
+type GetTasksCountRequest = Request<GetTasksCountParamsDto>;
 
 const joinOrCreate = async (req: joinOrCreateRequest, res: Response) => {
   const member = await companyService.joinOrCreate({
@@ -106,10 +111,37 @@ const getAvailability = async (req: GetAvailabilityRequest, res: Response) => {
   return res.status(200).json(availability);
 };
 
+const getTasks = async (req: GetTasksRequest, res: Response) => {
+  const { companyId } = req.params;
+  const { cursor, limit } = req.query as unknown as GetTasksQueryDto;
+
+  const tasks = await companyService.getTasks({
+    companyId,
+    cursorId: cursor,
+    limit: limit,
+    userId: req.user.id,
+  });
+
+  return res.status(200).json(tasks);
+};
+
+const getTasksCount = async (req: GetTasksCountRequest, res: Response) => {
+  const { companyId } = req.params;
+
+  const count = await companyService.getTasksCount({
+    companyId,
+    userId: req.user.id,
+  });
+
+  return res.status(200).json({ count });
+};
+
 export {
   joinOrCreate,
   userCompanies,
   getCompanyMembers,
+  getTasks,
+  getTasksCount,
   createMembership,
   deleteMember,
   getTimeline,

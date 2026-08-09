@@ -9,6 +9,10 @@ export const SERVER_ENDPOINTS = {
     companyTimeline: (companyId: string) => `/company/${companyId}/timeline`,
     companyAvailability: (companyId: string) =>
       `/company/${companyId}/availability`,
+
+    companyTasks: (companyId: string) => `/company/${companyId}/tasks`,
+    companyTasksCount: (companyId: string) =>
+      `/company/${companyId}/tasks-count`,
   },
   user: {
     getMemberships: "user/me/companies",

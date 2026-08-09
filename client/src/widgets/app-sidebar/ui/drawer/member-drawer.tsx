@@ -28,8 +28,8 @@ export function MemberDrawer() {
     <SidebarMenuItem>
       <Drawer direction="right">
         <DrawerTrigger asChild>
-          <SidebarMenuButton asChild className="w-full" tooltip="Members">
-            <div className="flex w-full items-center">
+          <SidebarMenuButton asChild className="py-4 cursor-pointer">
+            <div className="flex w-full items-center ">
               <User />
               <span>Members</span>
             </div>
