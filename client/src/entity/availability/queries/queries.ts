@@ -103,6 +103,12 @@ export const useCreateTimeSpan = () => {
 
       toast.error(getErrorMessage(err));
     },
+
+    onSettled: (_data, _error, vars) => {
+      queryClient.invalidateQueries({
+        queryKey: ["availability-time-spans", vars.availabilityId],
+      });
+    },
   });
 };
 export const useUpdateTimeSpan = () => {

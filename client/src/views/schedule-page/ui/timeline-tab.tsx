@@ -1,24 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TimelineProvider } from "@shared/ui/timeline/timeline";
-import { timeToMinutes } from "../model/utils";
-import Content from "./content";
 import { useParams } from "next/navigation";
-import { useTimelineRows, useTimelineTasks } from "@/entity/timeline";
-import TimelinePageSkeleton from "./shared/timeline-page-skeleton";
-
+import { TimelineProvider } from "@shared/ui/timeline/timeline";
+import {
+  Content,
+  Nav,
+  TimelineContent,
+  TimelinePageSkeleton,
+  timeToMinutes,
+  useCompanyTimeline,
+  useTimelineRows,
+  useTimelineTasks,
+  Zoom,
+} from "@entity/timeline";
+import { socket } from "@shared/api/websockets";
+import { queryClient } from "@shared/lib/query-client";
+import EmptyState from "@shared/ui/empty-state";
 import { useUpdateTimelineTask } from "@/entity/timeline/queries/queries";
-import EmptyState from "@/shared/ui/empty-state";
-import Zoom from "./zoom";
-import Nav from "./nav";
-import TimelineContent from "./timeline-content";
-import { socket } from "@/shared/api/websockets";
-import { queryClient } from "@/shared/lib/query-client";
 
-export default function TimelinePage() {
+interface TimelineTabProps {
+  active: boolean;
+}
+
+export default function TimelineTab({ active }: TimelineTabProps) {
   const [percentageInView, setPercentageInView] = useState(100);
-  const { timelineId } = useParams() as { timelineId: string | undefined };
+  const { companyId } = useParams() as { companyId?: string };
+  const { data: timeline } = useCompanyTimeline(companyId!, !!companyId);
+  const timelineId = timeline?.id;
+
   const updateTask = useUpdateTimelineTask();
   const {
     data: timelineRows,
@@ -78,28 +88,52 @@ export default function TimelinePage() {
     return conflicts.length === 0;
   };
 
+  console.log("TIMELINE TAB", {
+    active,
+    companyId,
+    timelineId,
+  });
   //WEBSOCKETS
   useEffect(() => {
-    socket.emit("join-timeline", timelineId);
-  }, [timelineId]);
+    if (!active || !timelineId) return;
+    console.log("EMIT JOIN TIMELINE", timelineId);
+    const joinTimeline = () => {
+      socket.emit("join-timeline", timelineId);
+    };
+
+    joinTimeline();
+    socket.on("connect", joinTimeline);
+
+    return () => {
+      socket.off("connect", joinTimeline);
+
+      socket.emit("leave-timeline", timelineId);
+    };
+  }, [active, timelineId]);
 
   useEffect(() => {
-    socket.on("timeline-task-updated", () => {
+    if (!timelineId) return;
+
+    const handleTimelineTaskUpdated = () => {
       queryClient.invalidateQueries({
         queryKey: ["timeline-tasks", timelineId],
       });
-    });
+    };
 
-    socket.on("timeline-row-updated", () => {
+    const handleTimelineRowUpdated = () => {
       queryClient.invalidateQueries({
         queryKey: ["timeline-rows", timelineId],
       });
-    });
+    };
+
+    socket.on("timeline-task-updated", handleTimelineTaskUpdated);
+    socket.on("timeline-row-updated", handleTimelineRowUpdated);
 
     return () => {
-      socket.off("timeline-updated");
+      socket.off("timeline-task-updated", handleTimelineTaskUpdated);
+      socket.off("timeline-row-updated", handleTimelineRowUpdated);
     };
-  }, []);
+  }, [timelineId]);
 
   if (isError || isTasksError)
     return <EmptyState text="Not found timeline or Access denied" />;

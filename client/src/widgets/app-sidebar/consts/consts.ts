@@ -1,4 +1,4 @@
-import { Blocks, StickyNotes } from "lucide-react";
+import { Blocks, ClipboardClock, StickyNotes } from "lucide-react";
 
 export const DATA = {
   navMain: [
@@ -13,6 +13,11 @@ export const DATA = {
       url: "/tasks",
       // isActive: true,
       icon: StickyNotes,
+    },
+    {
+      title: "Schedule",
+      url: "/schedule",
+      icon: ClipboardClock,
     },
   ],
 };

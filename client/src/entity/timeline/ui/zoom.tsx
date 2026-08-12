@@ -5,7 +5,7 @@ interface ZoomProps {
   onValueChange: (value: number) => void;
 }
 
-const Zoom = ({ value, onValueChange }: ZoomProps) => {
+export const Zoom = ({ value, onValueChange }: ZoomProps) => {
   return (
     <div className="flex flex-wrap gap-2 mt-4 w-full">
       <p className="leading-none mb-0  min-w-20">Zoom level</p>
@@ -20,5 +20,3 @@ const Zoom = ({ value, onValueChange }: ZoomProps) => {
     </div>
   );
 };
-
-export default Zoom;

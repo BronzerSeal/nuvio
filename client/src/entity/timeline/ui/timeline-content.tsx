@@ -9,7 +9,6 @@ import {
   TimelineHeader,
   TimelineRow,
 } from "@/shared/ui/timeline/timeline";
-import React from "react";
 import Row from "./shared/row";
 import Slot from "./shared/slot";
 
@@ -18,7 +17,7 @@ interface Props {
   timelineRows: TimelineRowType[];
 }
 
-const TimelineContent = ({ slots, timelineRows }: Props) => {
+export const TimelineContent = ({ slots, timelineRows }: Props) => {
   return (
     <Timeline slots={slots} rows={timelineRows ?? []}>
       <TimelineGrid>
@@ -39,5 +38,3 @@ const TimelineContent = ({ slots, timelineRows }: Props) => {
     </Timeline>
   );
 };
-
-export default TimelineContent;

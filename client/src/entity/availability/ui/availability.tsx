@@ -21,6 +21,7 @@ import tunnel from "tunnel-rat";
 import { nanoid } from "nanoid";
 import { useParams } from "next/navigation";
 import {
+  useCompanyAvailability,
   useCreateTimeSpan,
   useDeleteTimeSpan,
   useUpdateTimeSpan,
@@ -327,9 +328,13 @@ export function Availability({
 
   //---------------------------------------------------------------
   //SERVER
-  const { availabilityId } = useParams() as {
-    availabilityId: string | undefined;
-  };
+  const { companyId } = useParams() as { companyId?: string };
+  console.log(companyId);
+  const { data: availability } = useCompanyAvailability(
+    companyId!,
+    !!companyId,
+  );
+  const availabilityId = availability?.id;
   const { mutate: createTimespan } = useCreateTimeSpan();
   const { mutate: updateTimeSpan } = useUpdateTimeSpan();
   const { mutate: deleteTimeSpan } = useDeleteTimeSpan();

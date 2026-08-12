@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@shared/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/ui/tabs";
-import { Main } from "./main";
+import { Main } from "@shared/ui/main";
 import { Analytics } from "./shared/analytics";
 import { Overview } from "./shared/overview";
 import { RecentSales } from "./shared/recent-sales";
@@ -18,9 +18,6 @@ export function DashboardPage() {
       <Main>
         <div className="mb-2 flex items-center justify-between space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <div className="flex items-center space-x-2">
-            <Button>Download</Button>
-          </div>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
           <div className="w-full overflow-x-auto pb-2">

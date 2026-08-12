@@ -12,10 +12,4 @@ export const SITE_ENDPOINTS = {
 
   boards: (companyId: string, boardId: string) =>
     `${SITE_URL}/dashboard/${companyId}/boards/${boardId}`,
-
-  timeline: (companyId: string, timelineId: string) =>
-    `${SITE_URL}/dashboard/${companyId}/timeline/${timelineId}`,
-
-  availability: (companyId: string, availabilityId: string) =>
-    `${SITE_URL}/dashboard/${companyId}/availability/${availabilityId}`,
 };

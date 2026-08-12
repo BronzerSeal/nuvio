@@ -5,4 +5,8 @@ export const registerTimelineSocket = (io: Server, socket: Socket) => {
     socket.join(timelineId);
     console.log("joined timeline:", timelineId);
   });
+
+  socket.on("leave-timeline", (timelineId) => {
+    socket.leave(timelineId);
+  });
 };

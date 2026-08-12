@@ -15,7 +15,7 @@ import { CreateBoardModal } from "@/entity/board/ui/create-board-modal";
 import { MemberDrawer } from "./drawer/member-drawer";
 import { useParams } from "next/navigation";
 import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
-import CalendarButton from "./shared/calendar-button";
+
 const NavMain = () => {
   const [isNewBoardOpen, setIsNewBoardOpen] = React.useState(false);
   const { companyId } = useParams() as { companyId?: string };
@@ -43,7 +43,6 @@ const NavMain = () => {
         {/* Layer path  */}
         {/* <LayerCollapsible /> */}
         {/* members */}
-        <CalendarButton />
         <MemberDrawer />
       </SidebarMenu>
 

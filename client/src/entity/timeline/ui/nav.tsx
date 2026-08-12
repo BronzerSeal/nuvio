@@ -3,7 +3,7 @@ import CreateRoleBtn from "./shared/create-role-btn";
 import CreateTaskBtn from "./shared/create-task-btn";
 import DeleteFromTableBtn from "./shared/delete-from-table-btn";
 
-const Nav = () => {
+export const Nav = () => {
   return (
     <div className="flex justify-between w-full flex-wrap gap-2 md:gap-0">
       <ColorCodes />
@@ -15,5 +15,3 @@ const Nav = () => {
     </div>
   );
 };
-
-export default Nav;
