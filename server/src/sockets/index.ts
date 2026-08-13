@@ -1,14 +1,12 @@
 import { Server } from "socket.io";
 import { registerBoardSocket } from "./board.socket.js";
-import { registerTimelineSocket } from "./timeline.socket.js";
-import { registerAvailabilitySocket } from "./availability.socket.js";
+import { registerScheduleSocket } from "./schedule.socket.js";
 
 export const registerSockets = (io: Server) => {
   io.on("connection", (socket) => {
     console.log("user connected:", socket.id);
 
     registerBoardSocket(io, socket);
-    registerTimelineSocket(io, socket);
-    registerAvailabilitySocket(io, socket);
+    registerScheduleSocket(io, socket);
   });
 };

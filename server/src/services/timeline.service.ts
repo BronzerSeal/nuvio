@@ -83,13 +83,18 @@ export const createRow = async ({
     });
   }
 
-  return prisma.timelineRow.create({
+  const row = await prisma.timelineRow.create({
     data: {
       timelineId,
       label: rowName,
       capacity: 0,
     },
   });
+
+  return {
+    row,
+    companyId: timeline.companyId,
+  };
 };
 
 export const deleteRows = async ({
@@ -117,7 +122,10 @@ export const deleteRows = async ({
     },
   });
 
-  return deleted.count;
+  return {
+    count: deleted.count,
+    companyId: timeline.companyId,
+  };
 };
 
 export const getRows = async ({
@@ -188,7 +196,7 @@ export const createTask = async ({
     });
   }
 
-  return prisma.timelineTask.create({
+  const task = await prisma.timelineTask.create({
     data: {
       rowId,
       startTime,
@@ -198,6 +206,11 @@ export const createTask = async ({
       attendees,
     },
   });
+
+  return {
+    task,
+    companyId: timeline.companyId,
+  };
 };
 
 export const getTasks = async ({
@@ -271,13 +284,18 @@ export const updateTask = async ({
     });
   }
 
-  return prisma.timelineTask.update({
+  const updatedTask = await prisma.timelineTask.update({
     where: { id: taskId },
     data: {
       ...(startTime && { startTime }),
       ...(rowId && { rowId }),
     },
   });
+
+  return {
+    task: updatedTask,
+    companyId: timeline.companyId,
+  };
 };
 
 export const deleteTasks = async ({
@@ -307,5 +325,8 @@ export const deleteTasks = async ({
     },
   });
 
-  return deleted.count;
+  return {
+    deletedCount: deleted.count,
+    companyId: timeline.companyId,
+  };
 };

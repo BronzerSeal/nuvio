@@ -18,11 +18,7 @@ const Availability = dynamic(
   },
 );
 
-interface AvailabilityTabProps {
-  active: boolean;
-}
-
-const AvailabilityTab = ({ active }: AvailabilityTabProps) => {
+const AvailabilityTab = () => {
   const { companyId } = useParams() as { companyId?: string };
   const { data: availability, isLoading: isAvailabilityLoading } =
     useCompanyAvailability(companyId!, !!companyId);
@@ -32,28 +28,6 @@ const AvailabilityTab = ({ active }: AvailabilityTabProps) => {
     availabilityId!,
     !!availabilityId,
   );
-  console.log("AVAILABILITY TAB", {
-    active,
-    availabilityId,
-  });
-  //WEBSOCKETS
-  React.useEffect(() => {
-    if (!active || !availabilityId) return;
-
-    const joinAvailability = () => {
-      socket.emit("join-availability", availabilityId);
-    };
-
-    joinAvailability();
-    socket.on("connect", joinAvailability);
-
-    return () => {
-      socket.off("connect", joinAvailability);
-
-      socket.emit("leave-availability", availabilityId);
-    };
-  }, [active, availabilityId]);
-
   React.useEffect(() => {
     if (!availabilityId) return;
 

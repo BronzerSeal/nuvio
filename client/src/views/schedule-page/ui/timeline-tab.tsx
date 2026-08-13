@@ -19,11 +19,7 @@ import { queryClient } from "@shared/lib/query-client";
 import EmptyState from "@shared/ui/empty-state";
 import { useUpdateTimelineTask } from "@/entity/timeline/queries/queries";
 
-interface TimelineTabProps {
-  active: boolean;
-}
-
-export default function TimelineTab({ active }: TimelineTabProps) {
+export default function TimelineTab() {
   const [percentageInView, setPercentageInView] = useState(100);
   const { companyId } = useParams() as { companyId?: string };
   const { data: timeline } = useCompanyTimeline(companyId!, !!companyId);
@@ -87,29 +83,6 @@ export default function TimelineTab({ active }: TimelineTabProps) {
 
     return conflicts.length === 0;
   };
-
-  console.log("TIMELINE TAB", {
-    active,
-    companyId,
-    timelineId,
-  });
-  //WEBSOCKETS
-  useEffect(() => {
-    if (!active || !timelineId) return;
-    console.log("EMIT JOIN TIMELINE", timelineId);
-    const joinTimeline = () => {
-      socket.emit("join-timeline", timelineId);
-    };
-
-    joinTimeline();
-    socket.on("connect", joinTimeline);
-
-    return () => {
-      socket.off("connect", joinTimeline);
-
-      socket.emit("leave-timeline", timelineId);
-    };
-  }, [active, timelineId]);
 
   useEffect(() => {
     if (!timelineId) return;

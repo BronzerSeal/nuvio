@@ -37,7 +37,7 @@ const createTimeSpan = async (req: CreateTimeSpanRequest, res: Response) => {
   const { availabilityId } = req.params;
   const { start_time, end_time, week_day, active } = req.body;
 
-  const timeSpan = await availabilityService.createTimeSpan({
+  const { timeSpan, companyId } = await availabilityService.createTimeSpan({
     userId: req.user.id,
     availabilityId,
     start_time,
@@ -46,7 +46,7 @@ const createTimeSpan = async (req: CreateTimeSpanRequest, res: Response) => {
     active,
   });
 
-  io.to(req.params.availabilityId).emit("availability-updated");
+  io.to(`schedule:${companyId}`).emit("availability-updated");
 
   return res.status(201).json(timeSpan);
 };
@@ -55,7 +55,7 @@ const updateTimeSpan = async (req: UpdateTimeSpanRequest, res: Response) => {
   const { availabilityId, timeSpanId } = req.params;
   const { start_time, end_time, week_day, active } = req.body;
 
-  const timeSpan = await availabilityService.updateTimeSpan({
+  const { timeSpan, companyId } = await availabilityService.updateTimeSpan({
     userId: req.user.id,
     availabilityId,
     timeSpanId,
@@ -65,7 +65,7 @@ const updateTimeSpan = async (req: UpdateTimeSpanRequest, res: Response) => {
     active,
   });
 
-  io.to(req.params.availabilityId).emit("availability-updated");
+  io.to(`schedule:${companyId}`).emit("availability-updated");
 
   return res.status(200).json(timeSpan);
 };
@@ -73,13 +73,13 @@ const updateTimeSpan = async (req: UpdateTimeSpanRequest, res: Response) => {
 const deleteTimeSpan = async (req: DeleteTimeSpanRequest, res: Response) => {
   const { availabilityId, timeSpanId } = req.params;
 
-  const timeSpan = await availabilityService.deleteTimeSpan({
+  const { timeSpan, companyId } = await availabilityService.deleteTimeSpan({
     userId: req.user.id,
     availabilityId,
     timeSpanId,
   });
 
-  io.to(req.params.availabilityId).emit("availability-updated");
+  io.to(`schedule:${companyId}`).emit("availability-updated");
 
   return res.status(200).json(timeSpan);
 };
