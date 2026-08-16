@@ -2,8 +2,12 @@ import { Request, Response } from "express";
 import {
   GetUserCompaniesQueryDto,
   SearchUsersQueryDto,
+  UpdateUsersQueryDto,
 } from "../validate/user.validation.js";
 import { userService } from "../services/index.js";
+
+type SearchUsersRequest = Request<{}, {}, {}, SearchUsersQueryDto>;
+type UpdateUsersRequest = Request<{}, {}, UpdateUsersQueryDto, {}>;
 
 const userCompanies = async (req: Request, res: Response) => {
   const query = req.query as unknown as GetUserCompaniesQueryDto;
@@ -14,8 +18,6 @@ const userCompanies = async (req: Request, res: Response) => {
   });
   return res.status(200).json(companies);
 };
-
-type SearchUsersRequest = Request<{}, {}, {}, SearchUsersQueryDto>;
 
 const searchUsers = async (req: SearchUsersRequest, res: Response) => {
   const users = await userService.searchUsers({
@@ -32,4 +34,16 @@ const searchUsers = async (req: SearchUsersRequest, res: Response) => {
   );
 };
 
-export { userCompanies, searchUsers };
+const getMe = async (req: Request, res: Response) => {
+  const user = await userService.getMe(req.user.id);
+
+  return res.status(200).json(user);
+};
+
+const updateMe = async (req: UpdateUsersRequest, res: Response) => {
+  const user = await userService.updateMe(req.user.id, req.body);
+
+  return res.status(200).json(user);
+};
+
+export { userCompanies, searchUsers, getMe, updateMe };

@@ -1,8 +1,16 @@
+import { NotFoundError } from "../errors/NotFoundError.js";
 import prisma from "../lib/prisma.js";
+import { UpdateUsersQueryDto } from "../validate/user.validation.js";
 
 type userCompaniesParams = {
   limit: number;
   userId: string;
+};
+
+type SearchUsersParams = {
+  userId: string;
+  companyId?: string;
+  userNameOrEmail: string;
 };
 
 export const userCompanies = async ({ limit, userId }: userCompaniesParams) => {
@@ -21,12 +29,6 @@ export const userCompanies = async ({ limit, userId }: userCompaniesParams) => {
       createdAt: "desc",
     },
   });
-};
-
-type SearchUsersParams = {
-  userId: string;
-  companyId?: string;
-  userNameOrEmail: string;
 };
 
 export const searchUsers = async ({
@@ -75,4 +77,58 @@ export const searchUsers = async ({
       },
     },
   });
+};
+
+export const getMe = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      urls: true,
+    },
+  });
+
+  if (!user) {
+    throw new NotFoundError({
+      message: "User not found",
+    });
+  }
+
+  return user;
+};
+
+export const updateMe = async (
+  userId: string,
+  userData: UpdateUsersQueryDto,
+) => {
+  const user = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      name: userData.name,
+      email: userData.email,
+      bio: userData.bio,
+      ...(userData.urls !== undefined && {
+        urls: {
+          deleteMany: {},
+          create: userData.urls.map((url) => ({
+            value: url.value,
+          })),
+        },
+      }),
+    },
+    include: {
+      urls: true,
+    },
+  });
+
+  if (!user) {
+    throw new NotFoundError({
+      message: "User not found",
+    });
+  }
+
+  return user;
 };

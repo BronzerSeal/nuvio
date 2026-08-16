@@ -17,6 +17,8 @@ export const SERVER_ENDPOINTS = {
   user: {
     getMemberships: "user/me/companies",
     findUsers: "user/",
+    findMe: "user/me",
+    updateMe: "user/me",
   },
   board: {
     createBoard: "/board/new-board",

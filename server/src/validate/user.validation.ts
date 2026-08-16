@@ -10,8 +10,20 @@ export const searchUsersQuerySchema = z.object({
   userNameOrEmail: z.string().trim().min(1, "User name or email is required"),
 });
 
+export const updateUsersQuerySchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  bio: z.string().max(200),
+  urls: z.array(
+    z.object({
+      value: z.string().url(),
+    }),
+  ),
+});
+
 export type GetUserCompaniesQueryDto = z.infer<
   typeof getUserCompaniesQuerySchema
 >;
 
 export type SearchUsersQueryDto = z.infer<typeof searchUsersQuerySchema>;
+export type UpdateUsersQueryDto = z.infer<typeof updateUsersQuerySchema>;

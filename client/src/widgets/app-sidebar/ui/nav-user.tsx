@@ -12,24 +12,22 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/shared/ui/sidebar";
-import {
-  ChevronsUpDown,
-  Sparkles,
-  BadgeCheck,
-  CreditCard,
-  Bell,
-  LogOut,
-} from "lucide-react";
+import { ChevronsUpDown, Sparkles, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { authClient } from "@/shared/lib/auth";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { USER_NAV_URLS } from "../consts/consts";
+import Link from "next/link";
+import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
+import { useFindMe } from "@/entity/user";
 
 const NavUser = () => {
   const isMobile = useIsMobile();
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const { data: session } = useFindMe();
+  const { companyId } = useParams() as { companyId?: string };
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -52,18 +50,16 @@ const NavUser = () => {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={session?.user.image ?? undefined}
-                  alt={session?.user.name}
+                  src={session?.image ?? undefined}
+                  alt={session?.name}
                 />
                 <AvatarFallback className="rounded-lg">
-                  {session?.user.name?.slice(0, 1)}
+                  {session?.name?.slice(0, 1)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {session?.user.name}
-                </span>
-                <span className="truncate text-xs">{session?.user.email}</span>
+                <span className="truncate font-semibold">{session?.name}</span>
+                <span className="truncate text-xs">{session?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -78,18 +74,16 @@ const NavUser = () => {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={session?.user.image ?? undefined}
-                    alt={session?.user.name}
+                    src={session?.image ?? undefined}
+                    alt={session?.name}
                   />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {session?.user.name}
+                    {session?.name}
                   </span>
-                  <span className="truncate text-xs">
-                    {session?.user.email}
-                  </span>
+                  <span className="truncate text-xs">{session?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -102,18 +96,17 @@ const NavUser = () => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
+              {USER_NAV_URLS.map((item) => (
+                <Link
+                  href={SITE_ENDPOINTS.settings(companyId ?? "", item.url)}
+                  key={item.title}
+                >
+                  <DropdownMenuItem>
+                    {item.icon && <item.icon />}
+                    {item.title}
+                  </DropdownMenuItem>
+                </Link>
+              ))}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>

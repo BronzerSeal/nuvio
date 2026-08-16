@@ -6,6 +6,7 @@ export type User = {
   emailVerified: boolean;
   id: string;
   image: null | string;
+  bio: string;
   name: string;
   updatedAt: string;
 };
@@ -16,6 +17,10 @@ export type UserWithMembershipsId = Omit<
 > & {
   isMember: boolean;
   memberships: string[] | [];
+};
+
+export type UserWithUrls = User & {
+  urls: { value: string }[];
 };
 
 export type CroppedUser = {

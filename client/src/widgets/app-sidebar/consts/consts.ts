@@ -1,4 +1,11 @@
-import { Blocks, ClipboardClock, StickyNotes } from "lucide-react";
+import {
+  BadgeCheck,
+  Bell,
+  Blocks,
+  ClipboardClock,
+  CreditCard,
+  StickyNotes,
+} from "lucide-react";
 
 export const DATA = {
   navMain: [
@@ -21,3 +28,21 @@ export const DATA = {
     },
   ],
 };
+
+export const USER_NAV_URLS = [
+  {
+    title: "Profile",
+    url: "profile",
+    icon: BadgeCheck,
+  },
+  {
+    title: "Appearance",
+    url: "appearance",
+    icon: CreditCard,
+  },
+  {
+    title: "Account",
+    url: "account",
+    icon: Bell,
+  },
+];

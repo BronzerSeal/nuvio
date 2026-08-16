@@ -59,6 +59,7 @@ export default function TasksPage() {
     <Main>
       <div className="flex w-full flex-col gap-2 max-w-screen">
         <div className="flex items-center justify-between px-1 text-muted-foreground text-xs">
+          <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
           <span>{tasksCount?.count ?? 0} rows</span>
           {selected.length > 0 ? (
             <span>{selected.length.toLocaleString()} selected</span>

@@ -12,4 +12,7 @@ export const SITE_ENDPOINTS = {
 
   boards: (companyId: string, boardId: string) =>
     `${SITE_URL}/dashboard/${companyId}/boards/${boardId}`,
+
+  settings: (companyId: string, settingsType: string) =>
+    `${SITE_URL}/dashboard/${companyId}/settings/${settingsType}`,
 };

@@ -29,7 +29,9 @@ const BoardPage = () => {
       {isBoardInfoLoading ? (
         <Skeleton className="h-8 w-1/3 mb-2" />
       ) : (
-        <h1 className="mb-2">{boardInfo?.name}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-black">
+          {boardInfo?.name}
+        </h1>
       )}
 
       {isBoardInfoLoading ? (
