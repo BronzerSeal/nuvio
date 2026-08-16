@@ -1,10 +1,9 @@
 import {
-  BadgeCheck,
-  Bell,
   Blocks,
   ClipboardClock,
-  CreditCard,
+  Palette,
   StickyNotes,
+  UserPen,
 } from "lucide-react";
 
 export const DATA = {
@@ -12,13 +11,11 @@ export const DATA = {
     {
       title: "Dashboard",
       url: "/",
-      // isActive: true,
       icon: Blocks,
     },
     {
       title: "Tasks",
       url: "/tasks",
-      // isActive: true,
       icon: StickyNotes,
     },
     {
@@ -33,16 +30,11 @@ export const USER_NAV_URLS = [
   {
     title: "Profile",
     url: "profile",
-    icon: BadgeCheck,
+    icon: UserPen,
   },
   {
     title: "Appearance",
     url: "appearance",
-    icon: CreditCard,
-  },
-  {
-    title: "Account",
-    url: "account",
-    icon: Bell,
+    icon: Palette,
   },
 ];
