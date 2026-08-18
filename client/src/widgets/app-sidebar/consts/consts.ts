@@ -23,6 +23,11 @@ export const DATA = {
       url: "/schedule",
       icon: ClipboardClock,
     },
+    {
+      title: "Chat",
+      url: "/chat",
+      icon: ClipboardClock,
+    },
   ],
 };
 

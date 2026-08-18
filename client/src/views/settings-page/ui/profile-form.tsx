@@ -2,7 +2,6 @@
 
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { showSubmittedData } from "../model/show-submitted-data";
 import { cn } from "@shared/lib/utils";
 import { Button } from "@shared/ui/button";
 import {
@@ -55,10 +54,7 @@ export function ProfileForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((data) => {
-          updateUser(data);
-          showSubmittedData(data);
-        })}
+        onSubmit={form.handleSubmit((data) => updateUser(data))}
         className="space-y-6 bg-background p-4 rounded-lg"
       >
         <FormField
