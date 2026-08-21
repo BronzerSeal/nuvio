@@ -23,16 +23,32 @@ import { ScrollArea } from "@shared/ui/scroll-area/scroll-area";
 import { Separator } from "@shared/ui/separator";
 import { Main } from "@shared/ui/main";
 import { NewChat } from "./new-chat";
-import { type ChatUser, type Convo } from "../consts/chat-types";
+import { type Convo } from "../consts/chat-types";
 // Fake Data
 import { conversations } from "../consts/convo.json";
+import { useCompanyMemberships } from "@/entity/company";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import {
+  useChatMembers,
+  useChatMessages,
+  useSendChatMessage,
+} from "@/entity/chat";
+import { ChatMember, ChatMessage } from "@/shared/types/bd-types";
+import { useForm } from "react-hook-form";
+import sendChatMessage from "@/entity/chat/model/send-chat-message";
+import { authClient } from "@/shared/lib/auth";
+import { useFindMe } from "@/entity/user";
+
+type SendFormValues = {
+  message: string;
+};
 
 export default function ChatPage() {
   const [search, setSearch] = useState("");
-  const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
-  const [mobileSelectedUser, setMobileSelectedUser] = useState<ChatUser | null>(
-    null,
-  );
+  const [selectedUser, setSelectedUser] = useState<ChatMember | null>(null);
+  // console.log(selectedUser);
+  const [mobileSelectedUser, setMobileSelectedUser] =
+    useState<ChatMember | null>(null);
   const [createConversationDialogOpened, setCreateConversationDialog] =
     useState(false);
 
@@ -41,9 +57,67 @@ export default function ChatPage() {
     fullName.toLowerCase().includes(search.trim().toLowerCase()),
   );
 
-  const currentMessage = selectedUser?.messages.reduce(
-    (acc: Record<string, Convo[]>, obj) => {
-      const key = format(obj.timestamp, "d MMM, yyyy");
+  // console.log("Current Message:", filteredChatList);
+  //---------------------------------------
+  // BD
+  const { companyId } = useParams() as { companyId?: string };
+  const { data: session } = useFindMe();
+  const { data: users } = useChatMembers(companyId!, !!companyId);
+  const { data: messages } = useChatMessages(
+    companyId!,
+    selectedUser?.user.id!,
+    !!selectedUser?.user.id,
+  );
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const conversationId = searchParams.get("conversationId");
+
+  const handleSelectConversation = (id: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("conversationId", id);
+    router.replace(`?${params.toString()}`);
+  };
+
+  const {
+    handleSubmit,
+    setError,
+    reset,
+    register,
+    control,
+    formState: { errors },
+  } = useForm<SendFormValues>({
+    defaultValues: {
+      message: "",
+    },
+    mode: "onChange",
+  });
+
+  const { mutate: sendChatMessage } = useSendChatMessage();
+
+  const handleSubmitMessage = async (data: SendFormValues) => {
+    if (!companyId || !conversationId || !data.message.trim().length) {
+      console.log("Missing data for sending message", data);
+      return;
+    }
+
+    sendChatMessage({
+      companyId,
+      senderId: conversationId,
+      message: data.message,
+    });
+
+    reset();
+
+    // useSendChatMessage({ companyId:companyId, senderId: conversationId, message: data.message });
+  };
+  // console.log("BD: ", BD_users);
+  //---------------------------------------
+
+  const currentMessage = messages?.reduce(
+    (acc: Record<string, ChatMessage[]>, obj) => {
+      const key = format(obj.createdAt, "d MMM, yyyy");
 
       // Create an array for the category if it doesn't exist
       if (!acc[key]) {
@@ -58,8 +132,11 @@ export default function ChatPage() {
     {},
   );
 
-  const users = conversations.map(({ messages, ...user }) => user);
-
+  // const users = conversations.map(({ messages, ...user }) => user);
+  // console.log(users);
+  // console.log(filteredChatList);
+  console.log(messages);
+  console.log("session: ", session);
   return (
     <>
       <Main fixed>
@@ -102,13 +179,13 @@ export default function ChatPage() {
             </div>
 
             <ScrollArea className="-mx-3 h-full overflow-scroll p-3">
-              {filteredChatList.map((chatUsr) => {
-                const { id, profile, username, messages, fullName } = chatUsr;
-                const lastConvo = messages[0];
-                const lastMsg =
-                  lastConvo.sender === "You"
-                    ? `You: ${lastConvo.message}`
-                    : lastConvo.message;
+              {users?.map((chatUsr) => {
+                const { id, image, email, name } = chatUsr.user;
+                // const lastConvo = messages[0];
+                // const lastMsg =
+                //   lastConvo.sender === "You"
+                //     ? `You: ${lastConvo.message}`
+                //     : lastConvo.message;
                 return (
                   <Fragment key={id}>
                     <button
@@ -120,23 +197,24 @@ export default function ChatPage() {
                       )}
                       onClick={() => {
                         setSelectedUser(chatUsr);
+                        handleSelectConversation(chatUsr.user.id);
                         setMobileSelectedUser(chatUsr);
                       }}
                     >
                       <div className="flex gap-2">
                         <Avatar>
-                          <AvatarImage src={profile} alt={username} />
+                          <AvatarImage src={image} alt={email} />
                           <AvatarFallback>
-                            {getDisplayNameInitials(fullName)}
+                            {getDisplayNameInitials(name)}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <span className="col-start-2 row-span-2 font-medium">
-                            {fullName}
+                            {name}
                           </span>
-                          <span className="col-start-2 row-span-2 row-start-2 line-clamp-2 text-ellipsis text-muted-foreground group-hover:text-accent-foreground/90">
+                          {/* <span className="col-start-2 row-span-2 row-start-2 line-clamp-2 text-ellipsis text-muted-foreground group-hover:text-accent-foreground/90">
                             {lastMsg}
-                          </span>
+                          </span> */}
                         </div>
                       </div>
                     </button>
@@ -170,19 +248,19 @@ export default function ChatPage() {
                   <div className="flex items-center gap-2 lg:gap-4">
                     <Avatar className="size-9 lg:size-11">
                       <AvatarImage
-                        src={selectedUser.profile}
-                        alt={selectedUser.username}
+                        src={selectedUser.user.image || undefined}
+                        alt={selectedUser.user?.name}
                       />
                       <AvatarFallback>
-                        {getDisplayNameInitials(selectedUser.fullName)}
+                        {getDisplayNameInitials(selectedUser.user.name)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <span className="col-start-2 row-span-2 text-sm font-medium lg:text-base">
-                        {selectedUser.fullName}
+                        {selectedUser.user.name}
                       </span>
                       <span className="col-start-2 row-span-2 row-start-2 line-clamp-1 block max-w-32 text-xs text-nowrap text-ellipsis text-muted-foreground lg:max-w-none lg:text-sm">
-                        {selectedUser.title}
+                        {selectedUser.user.bio || selectedUser.user.email}
                       </span>
                     </div>
                   </div>
@@ -219,15 +297,16 @@ export default function ChatPage() {
                 <div className="flex size-full flex-1">
                   <div className="chat-text-container relative -me-4 flex flex-1 flex-col overflow-y-hidden">
                     <div className="chat-flex flex h-40 w-full grow flex-col-reverse justify-start gap-4 overflow-y-auto py-2 pe-4 pb-4">
+                      {/* currentMessage */}
                       {currentMessage &&
                         Object.keys(currentMessage).map((key) => (
                           <Fragment key={key}>
                             {currentMessage[key].map((msg, index) => (
                               <div
-                                key={`${msg.sender}-${msg.timestamp}-${index}`}
+                                key={`${msg.senderId}-${msg.createdAt}-${index}`}
                                 className={cn(
                                   "chat-box max-w-72 px-3 py-2 wrap-break-word shadow-lg",
-                                  msg.sender === "You"
+                                  msg.senderId === session?.id
                                     ? "self-end rounded-[16px_16px_0_16px] bg-primary/90 text-primary-foreground/75"
                                     : "self-start rounded-[16px_16px_16px_0] bg-muted",
                                 )}
@@ -236,11 +315,11 @@ export default function ChatPage() {
                                 <span
                                   className={cn(
                                     "mt-1 block text-xs font-light text-foreground/75 italic",
-                                    msg.sender === "You" &&
+                                    msg.senderId === session?.id &&
                                       "text-end text-primary-foreground/85",
                                   )}
                                 >
-                                  {format(msg.timestamp, "h:mm a")}
+                                  {format(msg.createdAt, "h:mm a")}
                                 </span>
                               </div>
                             ))}
@@ -250,7 +329,10 @@ export default function ChatPage() {
                     </div>
                   </div>
                 </div>
-                <form className="flex w-full flex-none gap-2 ">
+                <form
+                  onSubmit={handleSubmit(handleSubmitMessage)}
+                  className="flex w-full flex-none gap-2 "
+                >
                   <div className="flex flex-1 items-center gap-2 rounded-md border border-input bg-background px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:outline-hidden lg:gap-4">
                     <div className="space-x-1">
                       <Button
@@ -290,17 +372,21 @@ export default function ChatPage() {
                         type="text"
                         placeholder="Type your messages..."
                         className="h-8 w-full bg-inherit focus-visible:outline-hidden"
+                        {...register("message", {
+                          required: "Message is required",
+                        })}
                       />
                     </label>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="hidden sm:inline-flex"
+                      type="submit"
                     >
                       <Send size={20} />
                     </Button>
                   </div>
-                  <Button className="h-full sm:hidden">
+                  <Button className="h-full sm:hidden" type="submit">
                     <Send size={18} /> Send
                   </Button>
                 </form>
@@ -329,11 +415,11 @@ export default function ChatPage() {
             </div>
           )}
         </section>
-        <NewChat
+        {/* <NewChat
           users={users}
           onOpenChange={setCreateConversationDialog}
           open={createConversationDialogOpened}
-        />
+        /> */}
       </Main>
     </>
   );

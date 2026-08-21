@@ -28,6 +28,7 @@ export type CroppedUser = {
   email: string;
   image: string | undefined;
   name: string;
+  bio: string;
 };
 
 export type Company = {
@@ -123,4 +124,20 @@ export interface TimeSpan {
 export type Availability = {
   companyId: string;
   id: string;
+};
+
+//CHAT
+
+export type ChatMember = {
+  id: string;
+  user: CroppedUser;
+};
+
+export type ChatMessage = {
+  id: string;
+  chatId: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  createdAt: string;
 };

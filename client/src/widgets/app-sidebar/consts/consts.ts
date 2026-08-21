@@ -1,6 +1,7 @@
 import {
   Blocks,
   ClipboardClock,
+  MessageCircle,
   Palette,
   StickyNotes,
   UserPen,
@@ -26,7 +27,7 @@ export const DATA = {
     {
       title: "Chat",
       url: "/chat",
-      icon: ClipboardClock,
+      icon: MessageCircle,
     },
   ],
 };

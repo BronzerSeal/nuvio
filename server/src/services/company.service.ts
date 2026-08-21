@@ -75,7 +75,7 @@ export const joinOrCreate = async ({
       },
     });
 
-    //COMPANY TIMELINE && AVAILABILITY
+    //COMPANY TIMELINE && AVAILABILITY && CHAT
     await prisma.timeline.create({
       data: {
         companyId: company.id,
@@ -83,6 +83,12 @@ export const joinOrCreate = async ({
     });
 
     await prisma.availability.create({
+      data: {
+        companyId: company.id,
+      },
+    });
+
+    await prisma.chat.create({
       data: {
         companyId: company.id,
       },
@@ -168,6 +174,7 @@ export const getCompanyMembers = async ({
           email: true,
           image: true,
           id: true,
+          bio: true,
         },
       },
     },

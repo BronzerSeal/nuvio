@@ -18,18 +18,20 @@ import {
   DialogTitle,
 } from "./dialog-portal";
 import { type ChatUser } from "../consts/chat-types";
+import { MembershipWithUser } from "@/shared/types/bd-types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 
-type User = Omit<ChatUser, "messages">;
+// type User = Omit<ChatUser, "messages">;
 
 type NewChatProps = {
-  users: User[];
+  users: MembershipWithUser[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 export function NewChat({ users, onOpenChange, open }: NewChatProps) {
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<MembershipWithUser[]>([]);
 
-  const handleSelectUser = (user: User) => {
+  const handleSelectUser = (user: MembershipWithUser) => {
     if (!selectedUsers.find((u) => u.id === user.id)) {
       setSelectedUsers([...selectedUsers, user]);
     } else {
@@ -60,7 +62,7 @@ export function NewChat({ users, onOpenChange, open }: NewChatProps) {
             <span className="min-h-6 text-sm text-muted-foreground">To:</span>
             {selectedUsers.map((user) => (
               <Badge key={user.id} variant="default">
-                {user.fullName}
+                {user?.user?.name}
                 <button
                   className="ms-1 rounded-full ring-offset-background outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   onKeyDown={(e) => {
@@ -90,17 +92,21 @@ export function NewChat({ users, onOpenChange, open }: NewChatProps) {
                     className="flex items-center justify-between gap-2 hover:bg-accent hover:text-accent-foreground"
                   >
                     <div className="flex items-center gap-2">
-                      <img
-                        src={user.profile || "/placeholder.svg"}
-                        alt={user.fullName}
-                        className="h-8 w-8 rounded-full"
-                      />
+                      <Avatar>
+                        <AvatarImage
+                          src={user.user?.image || undefined}
+                          alt={user?.user?.name}
+                        />
+                        <AvatarFallback>
+                          {user?.user?.name.slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">
-                          {user.fullName}
+                          {user?.user?.name}
                         </span>
                         <span className="text-xs text-accent-foreground/70">
-                          {user.username}
+                          {user?.role}
                         </span>
                       </div>
                     </div>

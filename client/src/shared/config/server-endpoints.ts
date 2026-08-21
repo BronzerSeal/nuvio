@@ -57,4 +57,9 @@ export const SERVER_ENDPOINTS = {
     deleteTimeSpan: (availabilityId: string, timeSpanId: string) =>
       `/availability/${availabilityId}/timeSpans/${timeSpanId}`,
   },
+  chat: {
+    getChatMembers: (companyId: string) => `/chat/${companyId}`,
+    getChatMessages: (companyId: string, senderId: string) =>
+      `/chat/${companyId}/${senderId}`,
+  },
 };

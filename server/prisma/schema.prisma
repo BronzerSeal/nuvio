@@ -99,6 +99,7 @@ model Company {
   boards  Board[]
   timeline Timeline?
   availability Availability?
+  chat Chat?
 }
 
 enum CompanyRoles {
@@ -230,4 +231,26 @@ model TimeSpan {
   active          Boolean
 
   availability    Availability @relation(fields: [availabilityId],references: [id], onDelete: Cascade)
+}
+
+//CHAT
+
+model Chat {
+  id          String          @id @default(cuid())
+  companyId   String          @unique()
+  messages    ChatMessage[]
+
+  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id          String        @id @default(cuid())
+  chatId      String
+  senderId    String
+  receiverId  String
+  message     String
+
+  createdAt   DateTime      @default(now())
+
+  chat        Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
 }
