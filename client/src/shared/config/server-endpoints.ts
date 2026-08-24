@@ -59,7 +59,9 @@ export const SERVER_ENDPOINTS = {
   },
   chat: {
     getChatMembers: (companyId: string) => `/chat/${companyId}`,
-    getChatMessages: (companyId: string, senderId: string) =>
-      `/chat/${companyId}/${senderId}`,
+    getConversation: (companyId: string, userId: string) =>
+      `/chat/${companyId}/conversation/${userId}`,
+    getChatMessages: (companyId: string, conversationId: string) =>
+      `/chat/${companyId}/${conversationId}`,
   },
 };

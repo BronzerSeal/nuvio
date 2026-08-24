@@ -9,6 +9,50 @@ type getChatMembersParams = {
   cursorId?: string;
 };
 
+type getChatMessagesParams = {
+  userId: string;
+  companyId: string;
+  conversationId: string;
+  limit: number;
+  cursorId?: string;
+};
+
+type sendChatMessageParams = {
+  userId: string;
+  companyId: string;
+  conversationId: string;
+  message: string;
+};
+
+type getConversationParams = {
+  userId: string;
+  companyId: string;
+  targetUserId: string;
+};
+
+const requireConversationAccess = async ({
+  userId,
+  companyId,
+  conversationId,
+}: getChatMessagesParams) => {
+  await requireCompanyRole(userId, companyId, ["member", "admin", "owner"]);
+
+  const conversation = await prisma.chatConversation.findFirst({
+    where: {
+      id: conversationId,
+      chat: { companyId },
+      OR: [{ user1Id: userId }, { user2Id: userId }],
+    },
+    select: { id: true },
+  });
+
+  if (!conversation) {
+    throw new NotFoundError({ message: "Conversation not found" });
+  }
+
+  return conversation;
+};
+
 export const getChatMembers = async ({
   userId,
   companyId,
@@ -58,38 +102,74 @@ export const getChatMembers = async ({
   };
 };
 
-type getChatMessagesParams = {
-  userId: string;
-  companyId: string;
-  senderId: string;
-  limit: number;
-  cursorId?: string;
-};
+export const getConversation = async ({
+  userId,
+  companyId,
+  targetUserId,
+}: getConversationParams) => {
+  await requireCompanyRole(userId, companyId, ["member", "admin", "owner"]);
 
-type sendChatMessageParams = {
-  userId: string;
-  companyId: string;
-  senderId: string;
-  message: string;
+  const recipient = await prisma.companyMember.findUnique({
+    where: {
+      userId_companyId: {
+        userId: targetUserId,
+        companyId,
+      },
+    },
+    select: { userId: true },
+  });
+
+  if (!recipient) {
+    throw new NotFoundError({ message: "Conversation participant not found" });
+  }
+
+  const [user1Id, user2Id] = [userId, targetUserId].sort();
+  const chat = await prisma.chat.upsert({
+    where: { companyId },
+    update: {},
+    create: { companyId },
+    select: { id: true },
+  });
+
+  const conversation = await prisma.chatConversation.upsert({
+    where: {
+      chatId_user1Id_user2Id: {
+        chatId: chat.id,
+        user1Id,
+        user2Id,
+      },
+    },
+    update: {},
+    create: {
+      chatId: chat.id,
+      user1Id,
+      user2Id,
+    },
+    select: { id: true },
+  });
+
+  return { conversationId: conversation.id };
 };
 
 export const getChatMessages = async ({
   userId,
   companyId,
-  senderId,
+  conversationId,
   limit,
   cursorId,
 }: getChatMessagesParams) => {
-  await requireCompanyRole(userId, companyId, ["member", "admin", "owner"]);
+  const conversation = await requireConversationAccess({
+    userId,
+    companyId,
+    conversationId,
+    limit,
+    cursorId,
+  });
 
   const take = Number(limit);
   const messages = await prisma.chatMessage.findMany({
     where: {
-      chat: { companyId },
-      OR: [
-        { senderId: userId, receiverId: senderId },
-        { senderId, receiverId: userId },
-      ],
+      conversationId: conversation.id,
     },
     orderBy: { createdAt: "desc" },
     take: take + 1,
@@ -110,39 +190,20 @@ export const getChatMessages = async ({
 export const sendChatMessage = async ({
   userId,
   companyId,
-  senderId,
+  conversationId,
   message,
 }: sendChatMessageParams) => {
-  await requireCompanyRole(userId, companyId, ["member", "admin", "owner"]);
-
-  const recipient = await prisma.companyMember.findUnique({
-    where: {
-      userId_companyId: {
-        userId: senderId,
-        companyId,
-      },
-    },
-    select: { userId: true },
+  const conversation = await requireConversationAccess({
+    userId,
+    companyId,
+    conversationId,
+    limit: 1,
   });
-
-  if (!recipient) {
-    throw new NotFoundError({ message: "Message recipient not found" });
-  }
-
-  const chat = await prisma.chat.findUnique({
-    where: { companyId },
-    select: { id: true },
-  });
-
-  if (!chat) {
-    throw new NotFoundError({ message: "Chat not found for this company" });
-  }
 
   return prisma.chatMessage.create({
     data: {
-      chatId: chat.id,
+      conversationId: conversation.id,
       senderId: userId,
-      receiverId: senderId,
       message,
     },
   });

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Fragment } from "react/jsx-runtime";
 import { format } from "date-fns";
 import {
@@ -23,21 +23,19 @@ import { ScrollArea } from "@shared/ui/scroll-area/scroll-area";
 import { Separator } from "@shared/ui/separator";
 import { Main } from "@shared/ui/main";
 import { NewChat } from "./new-chat";
-import { type Convo } from "../consts/chat-types";
-// Fake Data
-import { conversations } from "../consts/convo.json";
-import { useCompanyMemberships } from "@/entity/company";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
   useChatMembers,
   useChatMessages,
+  useConversation,
   useSendChatMessage,
 } from "@/entity/chat";
 import { ChatMember, ChatMessage } from "@/shared/types/bd-types";
 import { useForm } from "react-hook-form";
-import sendChatMessage from "@/entity/chat/model/send-chat-message";
-import { authClient } from "@/shared/lib/auth";
 import { useFindMe } from "@/entity/user";
+import { socket } from "@/shared/api/websockets";
+import { queryClient } from "@/shared/lib/query-client";
+import { useChatMembersHook } from "@/entity/chat/hooks/use-chat-members-hook";
 
 type SendFormValues = {
   message: string;
@@ -46,48 +44,30 @@ type SendFormValues = {
 export default function ChatPage() {
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<ChatMember | null>(null);
-  // console.log(selectedUser);
   const [mobileSelectedUser, setMobileSelectedUser] =
     useState<ChatMember | null>(null);
   const [createConversationDialogOpened, setCreateConversationDialog] =
     useState(false);
 
-  // Filtered data based on the search query
-  const filteredChatList = conversations.filter(({ fullName }) =>
-    fullName.toLowerCase().includes(search.trim().toLowerCase()),
-  );
-
-  // console.log("Current Message:", filteredChatList);
   //---------------------------------------
   // BD
   const { companyId } = useParams() as { companyId?: string };
   const { data: session } = useFindMe();
-  const { data: users } = useChatMembers(companyId!, !!companyId);
-  const { data: messages } = useChatMessages(
+  // const { data: users } = useChatMembers(companyId!, !!companyId);
+  const { members, cursor } = useChatMembersHook(companyId!, !!companyId);
+  const { data: conversation } = useConversation(
     companyId!,
     selectedUser?.user.id!,
-    !!selectedUser?.user.id,
+    !!companyId && !!selectedUser?.user.id,
   );
 
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const { data: messages } = useChatMessages(
+    companyId!,
+    conversation?.conversationId!,
+    !!conversation?.conversationId,
+  );
 
-  const conversationId = searchParams.get("conversationId");
-
-  const handleSelectConversation = (id: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("conversationId", id);
-    router.replace(`?${params.toString()}`);
-  };
-
-  const {
-    handleSubmit,
-    setError,
-    reset,
-    register,
-    control,
-    formState: { errors },
-  } = useForm<SendFormValues>({
+  const { handleSubmit, reset, register } = useForm<SendFormValues>({
     defaultValues: {
       message: "",
     },
@@ -97,22 +77,49 @@ export default function ChatPage() {
   const { mutate: sendChatMessage } = useSendChatMessage();
 
   const handleSubmitMessage = async (data: SendFormValues) => {
-    if (!companyId || !conversationId || !data.message.trim().length) {
+    if (
+      !companyId ||
+      !conversation?.conversationId ||
+      !data.message.trim().length
+    ) {
       console.log("Missing data for sending message", data);
       return;
     }
 
     sendChatMessage({
       companyId,
-      senderId: conversationId,
+      conversationId: conversation.conversationId,
       message: data.message,
     });
 
     reset();
-
-    // useSendChatMessage({ companyId:companyId, senderId: conversationId, message: data.message });
   };
-  // console.log("BD: ", BD_users);
+
+  //WEBSOCKETS
+  useEffect(() => {
+    const conversationId = conversation?.conversationId;
+
+    if (!conversationId) return;
+
+    queryClient.invalidateQueries({
+      queryKey: ["chat-messages", companyId, conversationId],
+    });
+
+    socket.emit("join-conversation", conversationId);
+
+    const handleConversationUpdated = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["chat-messages", companyId, conversationId],
+      });
+    };
+
+    socket.on("conversation-updated", handleConversationUpdated);
+
+    return () => {
+      socket.off("conversation-updated", handleConversationUpdated);
+    };
+  }, [conversation?.conversationId, companyId, queryClient]);
+
   //---------------------------------------
 
   const currentMessage = messages?.reduce(
@@ -132,15 +139,10 @@ export default function ChatPage() {
     {},
   );
 
-  // const users = conversations.map(({ messages, ...user }) => user);
-  // console.log(users);
-  // console.log(filteredChatList);
-  console.log(messages);
-  console.log("session: ", session);
   return (
     <>
       <Main fixed>
-        <section className="flex h-full gap-6">
+        <section className="flex h-full min-h-0 gap-6">
           {/* Left Side */}
           <div className="flex w-full flex-col gap-2 sm:w-56 lg:w-72 2xl:w-80 ">
             <div className="sticky top-0 z-10 -mx-4  px-4 pb-3 shadow-md sm:static sm:z-auto sm:mx-0 sm:p-0 sm:shadow-none">
@@ -179,7 +181,7 @@ export default function ChatPage() {
             </div>
 
             <ScrollArea className="-mx-3 h-full overflow-scroll p-3">
-              {users?.map((chatUsr) => {
+              {members?.map((chatUsr) => {
                 const { id, image, email, name } = chatUsr.user;
                 // const lastConvo = messages[0];
                 // const lastMsg =
@@ -197,7 +199,6 @@ export default function ChatPage() {
                       )}
                       onClick={() => {
                         setSelectedUser(chatUsr);
-                        handleSelectConversation(chatUsr.user.id);
                         setMobileSelectedUser(chatUsr);
                       }}
                     >
@@ -222,6 +223,7 @@ export default function ChatPage() {
                   </Fragment>
                 );
               })}
+              {cursor}
             </ScrollArea>
           </div>
 
@@ -415,11 +417,11 @@ export default function ChatPage() {
             </div>
           )}
         </section>
-        {/* <NewChat
-          users={users}
+        <NewChat
+          users={members}
           onOpenChange={setCreateConversationDialog}
           open={createConversationDialogOpened}
-        /> */}
+        />
       </Main>
     </>
   );

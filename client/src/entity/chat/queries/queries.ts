@@ -1,8 +1,21 @@
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/shared/lib/query-client";
 import getChatMembers from "../model/get-chat-members";
 import getChatMessages from "../model/get-chat-messages";
+import getConversation from "../model/get-conversation";
 import sendChatMessage from "../model/send-chat-message";
+
+export const useConversation = (
+  companyId: string,
+  userId: string,
+  enabled: boolean,
+) => {
+  return useQuery({
+    queryKey: ["chat-conversation", companyId, userId],
+    queryFn: () => getConversation(companyId, userId),
+    enabled,
+  });
+};
 
 export const useChatMembers = (companyId: string, enabled: boolean) => {
   return useInfiniteQuery({
@@ -24,13 +37,13 @@ export const useChatMembers = (companyId: string, enabled: boolean) => {
 
 export const useChatMessages = (
   companyId: string,
-  senderId: string,
+  conversationId: string,
   enabled: boolean,
 ) => {
   return useInfiniteQuery({
-    queryKey: ["chat-messages", companyId, senderId],
+    queryKey: ["chat-messages", companyId, conversationId],
     queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
-      getChatMessages(companyId, senderId, pageParam),
+      getChatMessages(companyId, conversationId, pageParam),
     initialPageParam: undefined,
     getNextPageParam: (lastPage) =>
       lastPage.hasNextPage ? lastPage.nextCursor : undefined,
@@ -45,15 +58,19 @@ export const useSendChatMessage = () => {
     mutationFn: ({
       message,
       companyId,
-      senderId,
+      conversationId,
     }: {
       message: string;
       companyId: string;
-      senderId: string;
-    }) => sendChatMessage({ companyId, senderId, message }),
+      conversationId: string;
+    }) => sendChatMessage({ companyId, conversationId, message }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["chat-messages", variables.companyId, variables.senderId],
+        queryKey: [
+          "chat-messages",
+          variables.companyId,
+          variables.conversationId,
+        ],
       });
     },
   });

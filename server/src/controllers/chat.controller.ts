@@ -2,13 +2,16 @@ import { Request, Response } from "express";
 import {
   getChatMembersDto,
   getChatMessagesDto,
+  getConversationDto,
   getChatMembersQuerySchemaDto,
   sendChatMessageBodyDto,
 } from "../validate/chat.validation.js";
 import { chatService } from "../services/index.js";
+import { io } from "../server.js";
 
 type getChatMemberRequest = Request<getChatMembersDto>;
 type getChatMessagesRequest = Request<getChatMessagesDto>;
+type getConversationRequest = Request<getConversationDto>;
 type sendChatMessageRequest = Request<
   getChatMessagesDto,
   {},
@@ -42,6 +45,16 @@ const getChatMessages = async (req: getChatMessagesRequest, res: Response) => {
   return res.status(200).json(messages);
 };
 
+const getConversation = async (req: getConversationRequest, res: Response) => {
+  const conversation = await chatService.getConversation({
+    userId: req.user.id,
+    companyId: req.params.companyId,
+    targetUserId: req.params.userId,
+  });
+
+  return res.status(200).json(conversation);
+};
+
 const sendChatMessage = async (req: sendChatMessageRequest, res: Response) => {
   const message = await chatService.sendChatMessage({
     userId: req.user.id,
@@ -49,7 +62,9 @@ const sendChatMessage = async (req: sendChatMessageRequest, res: Response) => {
     ...req.body,
   });
 
+  io.to(req.params.conversationId).emit("conversation-updated");
+
   return res.status(201).json(message);
 };
 
-export { getChatMembers, getChatMessages, sendChatMessage };
+export { getChatMembers, getChatMessages, getConversation, sendChatMessage };

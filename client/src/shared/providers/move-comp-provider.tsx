@@ -9,9 +9,10 @@ export function MoveCompProvider({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <TooltipProvider>
         <AppSidebar />
-        <SidebarInset>
+        <SidebarInset className="min-h-0">
           <SearchPanel />
-          {children}
+
+          <div className="min-h-0 flex-1">{children}</div>
         </SidebarInset>
       </TooltipProvider>
     </SidebarProvider>

@@ -238,19 +238,30 @@ model TimeSpan {
 model Chat {
   id          String          @id @default(cuid())
   companyId   String          @unique()
-  messages    ChatMessage[]
+  conversations ChatConversation[]
 
   company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
+model ChatConversation {
+  id       String @id @default(cuid())
+  chatId   String
+  user1Id  String
+  user2Id  String
+
+  chat     Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@unique([chatId, user1Id, user2Id])
+}
+
 model ChatMessage {
   id          String        @id @default(cuid())
-  chatId      String
+  conversationId       String
   senderId    String
-  receiverId  String
   message     String
 
   createdAt   DateTime      @default(now())
 
-  chat        Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }

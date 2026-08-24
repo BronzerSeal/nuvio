@@ -17,9 +17,17 @@ router.get(
   chatController.getChatMembers,
 );
 
-// GET /chat/:companyId/:senderId
+// GET /chat/:companyId/conversation/:userId
 router.get(
-  "/:companyId/:senderId",
+  "/:companyId/conversation/:userId",
+  authMiddleware,
+  validate({ params: chatValidation.getConversation }),
+  chatController.getConversation,
+);
+
+// GET /chat/:companyId/:conversationId
+router.get(
+  "/:companyId/:conversationId",
   authMiddleware,
   validate({
     params: chatValidation.getChatMessages,
@@ -28,9 +36,9 @@ router.get(
   chatController.getChatMessages,
 );
 
-// POST /chat/:companyId/:senderId
+// POST /chat/:companyId/:conversationId
 router.post(
-  "/:companyId/:senderId",
+  "/:companyId/:conversationId",
   authMiddleware,
   validate({
     params: chatValidation.getChatMessages,

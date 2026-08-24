@@ -4,17 +4,17 @@ import { ChatMessage } from "@/shared/types/bd-types";
 
 type SendChatMessageParams = {
   companyId: string;
-  senderId: string;
+  conversationId: string;
   message: string;
 };
 
 const sendChatMessage = async ({
   companyId,
-  senderId,
+  conversationId,
   message,
 }: SendChatMessageParams): Promise<ChatMessage> => {
   const response = await http.post<ChatMessage>(
-    SERVER_ENDPOINTS.chat.getChatMessages(companyId, senderId),
+    SERVER_ENDPOINTS.chat.getChatMessages(companyId, conversationId),
     { message },
   );
 

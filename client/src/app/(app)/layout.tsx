@@ -8,11 +8,9 @@ export default async function RootLayout({
 }>) {
   return (
     <MoveCompProvider>
-      <div className="relative isolate overflow-x-hidden bg-background text-foreground">
+      <div className="relative isolate overflow-x-hidden bg-background text-foreground min-h-0 h-full">
         <BackgroundRippleEffect />
-        <div className="relative z-10 flex min-h-screen flex-col">
-          {children}
-        </div>
+        <div className="relative z-10 flex h-full flex-col ">{children}</div>
       </div>
     </MoveCompProvider>
   );

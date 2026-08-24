@@ -17,21 +17,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./dialog-portal";
-import { type ChatUser } from "../consts/chat-types";
-import { MembershipWithUser } from "@/shared/types/bd-types";
+import { ChatMember, MembershipWithUser } from "@/shared/types/bd-types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 
 // type User = Omit<ChatUser, "messages">;
 
 type NewChatProps = {
-  users: MembershipWithUser[];
+  users: ChatMember[] | undefined;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 export function NewChat({ users, onOpenChange, open }: NewChatProps) {
-  const [selectedUsers, setSelectedUsers] = useState<MembershipWithUser[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<ChatMember[]>([]);
 
-  const handleSelectUser = (user: MembershipWithUser) => {
+  const handleSelectUser = (user: ChatMember) => {
     if (!selectedUsers.find((u) => u.id === user.id)) {
       setSelectedUsers([...selectedUsers, user]);
     } else {
@@ -85,7 +84,7 @@ export function NewChat({ users, onOpenChange, open }: NewChatProps) {
             <CommandList>
               <CommandEmpty>No people found.</CommandEmpty>
               <CommandGroup>
-                {users.map((user) => (
+                {users?.map((user) => (
                   <CommandItem
                     key={user.id}
                     onSelect={() => handleSelectUser(user)}
@@ -106,7 +105,7 @@ export function NewChat({ users, onOpenChange, open }: NewChatProps) {
                           {user?.user?.name}
                         </span>
                         <span className="text-xs text-accent-foreground/70">
-                          {user?.role}
+                          {user?.user?.email}
                         </span>
                       </div>
                     </div>
