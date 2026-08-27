@@ -83,6 +83,7 @@ export const getChatMembers = async ({
     take: take + 1,
 
     cursor: cursorId ? { id: cursorId } : undefined,
+    skip: cursorId ? 1 : undefined,
 
     orderBy: {
       id: "desc",

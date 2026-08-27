@@ -40,27 +40,30 @@ const NavBoards = () => {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Boards</SidebarGroupLabel>
+      <SidebarGroupLabel>{!companyId ? "" : "Boards"}</SidebarGroupLabel>
       <SidebarMenu>
         {/* new board */}
-        <SidebarMenuSubItem
-          className="cursor-pointer"
-          onClick={() => setIsNewBoardOpen((prev) => !prev)}
-        >
-          <SidebarMenuSubButton asChild className="h-8">
-            <div>
-              <PlusIcon />
-              <p>new board</p>
-            </div>
-          </SidebarMenuSubButton>
-        </SidebarMenuSubItem>
+
+        {companyId && (
+          <SidebarMenuSubItem
+            className="cursor-pointer"
+            onClick={() => setIsNewBoardOpen((prev) => !prev)}
+          >
+            <SidebarMenuSubButton asChild className="h-8">
+              <div>
+                <PlusIcon />
+                <p>new board</p>
+              </div>
+            </SidebarMenuSubButton>
+          </SidebarMenuSubItem>
+        )}
 
         {isCompanyBoardsLoading ? (
           <div className="p-2">
             <SimpleLoader />
           </div>
         ) : !companyId ? (
-          <p>no company</p>
+          <p></p>
         ) : (
           companyBoards?.map((item) => (
             <SidebarMenuItem key={item.id}>

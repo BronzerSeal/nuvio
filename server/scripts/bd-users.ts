@@ -1,77 +1,78 @@
 import prisma from "../src/lib/prisma";
 
-const mockUsers = [
-  {
-    id: "mock-user-1",
-    name: "Alex Johnson",
-    email: "alex.johnson@mock.com",
-    image: "https://i.pravatar.cc/150?img=1",
-    bio: "Frontend Developer",
-  },
-  {
-    id: "mock-user-2",
-    name: "Emma Wilson",
-    email: "emma.wilson@mock.com",
-    image: "https://i.pravatar.cc/150?img=2",
-    bio: "Product Designer",
-  },
-  {
-    id: "mock-user-3",
-    name: "Daniel Smith",
-    email: "daniel.smith@mock.com",
-    image: "https://i.pravatar.cc/150?img=3",
-    bio: "Backend Developer",
-  },
-  {
-    id: "mock-user-4",
-    name: "Sophia Brown",
-    email: "sophia.brown@mock.com",
-    image: "https://i.pravatar.cc/150?img=4",
-    bio: "Project Manager",
-  },
-  {
-    id: "mock-user-5",
-    name: "Michael Davis",
-    email: "michael.davis@mock.com",
-    image: "https://i.pravatar.cc/150?img=5",
-    bio: "Software Engineer",
-  },
-  {
-    id: "mock-user-6",
-    name: "Olivia Miller",
-    email: "olivia.miller@mock.com",
-    image: "https://i.pravatar.cc/150?img=6",
-    bio: "UI/UX Designer",
-  },
-  {
-    id: "mock-user-7",
-    name: "James Taylor",
-    email: "james.taylor@mock.com",
-    image: "https://i.pravatar.cc/150?img=7",
-    bio: "Full Stack Developer",
-  },
-  {
-    id: "mock-user-8",
-    name: "Isabella Anderson",
-    email: "isabella.anderson@mock.com",
-    image: "https://i.pravatar.cc/150?img=8",
-    bio: "QA Engineer",
-  },
-  {
-    id: "mock-user-9",
-    name: "William Thomas",
-    email: "william.thomas@mock.com",
-    image: "https://i.pravatar.cc/150?img=9",
-    bio: "DevOps Engineer",
-  },
-  {
-    id: "mock-user-10",
-    name: "Mia Jackson",
-    email: "mia.jackson@mock.com",
-    image: "https://i.pravatar.cc/150?img=10",
-    bio: "Marketing Manager",
-  },
+const firstNames = [
+  "Alex",
+  "Emma",
+  "Daniel",
+  "Sophia",
+  "Michael",
+  "Olivia",
+  "James",
+  "Isabella",
+  "William",
+  "Mia",
+  "Noah",
+  "Charlotte",
+  "Lucas",
+  "Amelia",
+  "Henry",
+  "Evelyn",
+  "Benjamin",
+  "Harper",
+  "Jack",
+  "Ella",
 ];
+
+const lastNames = [
+  "Johnson",
+  "Wilson",
+  "Smith",
+  "Brown",
+  "Davis",
+  "Miller",
+  "Taylor",
+  "Anderson",
+  "Thomas",
+  "Jackson",
+  "White",
+  "Harris",
+  "Martin",
+  "Thompson",
+  "Garcia",
+  "Martinez",
+  "Robinson",
+  "Clark",
+  "Lewis",
+  "Walker",
+];
+
+const jobs = [
+  "Frontend Developer",
+  "Product Designer",
+  "Backend Developer",
+  "Project Manager",
+  "Software Engineer",
+  "UI/UX Designer",
+  "Full Stack Developer",
+  "QA Engineer",
+  "DevOps Engineer",
+  "Marketing Manager",
+];
+
+const USERS_COUNT = 20;
+
+const mockUsers = Array.from({ length: USERS_COUNT }, (_, index) => {
+  const firstName = firstNames[index];
+  const lastName = lastNames[index];
+
+  return {
+    id: `mock-user-${index + 1}`,
+    name: `${firstName} ${lastName}`,
+    email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@mock.com`,
+    image: `https://i.pravatar.cc/150?img=${index + 1}`,
+    bio: jobs[index % jobs.length],
+  };
+});
 
 async function main() {
   const companies = await prisma.company.findMany({

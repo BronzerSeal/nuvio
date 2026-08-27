@@ -10,6 +10,7 @@ import LoginForm from "./login-form";
 import RegisterPage from "./register-form";
 import ParticleConstellation from "@/shared/ui/particle-constellation-bg";
 import { Logo } from "./logo";
+import ServerStatus from "./server-status";
 
 const EnterPage = () => {
   return (
@@ -17,6 +18,8 @@ const EnterPage = () => {
       <ParticleConstellation className="absolute" />
 
       <Logo />
+
+      <ServerStatus />
 
       <div className="flex w-full max-w-sm flex-col z-10 ">
         <Tabs defaultValue="login">

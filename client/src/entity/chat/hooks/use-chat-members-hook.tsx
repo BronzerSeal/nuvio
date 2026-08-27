@@ -7,10 +7,14 @@ export const useChatMembersHook = (companyId: string, enabled: boolean) => {
     data: members,
     isLoading,
     fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useChatMembers(companyId, enabled);
 
   const cursorRef = useIntersection(() => {
-    fetchNextPage();
+    if (hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
   });
 
   const cursor = <div ref={cursorRef}></div>;
@@ -21,20 +25,23 @@ export const useChatMembersHook = (companyId: string, enabled: boolean) => {
 export function useIntersection(onIntersect: () => void) {
   const unsubscribe = useRef(() => {});
 
-  return useCallback((el: HTMLDivElement | null) => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((intersection) => {
-        if (intersection.isIntersecting) {
-          onIntersect();
-        }
+  return useCallback(
+    (el: HTMLDivElement | null) => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((intersection) => {
+          if (intersection.isIntersecting) {
+            onIntersect();
+          }
+        });
       });
-    });
 
-    if (el) {
-      observer.observe(el);
-      unsubscribe.current = () => observer.disconnect();
-    } else {
-      unsubscribe.current();
-    }
-  }, []);
+      if (el) {
+        observer.observe(el);
+        unsubscribe.current = () => observer.disconnect();
+      } else {
+        unsubscribe.current();
+      }
+    },
+    [onIntersect],
+  );
 }

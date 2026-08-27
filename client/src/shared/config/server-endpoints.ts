@@ -64,4 +64,7 @@ export const SERVER_ENDPOINTS = {
     getChatMessages: (companyId: string, conversationId: string) =>
       `/chat/${companyId}/${conversationId}`,
   },
+  server: {
+    serverStatus: "server/server-status",
+  },
 };
