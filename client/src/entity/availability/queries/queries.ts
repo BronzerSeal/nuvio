@@ -6,12 +6,55 @@ import { toast } from "sonner";
 import { updateTimeSpan } from "../model/update-time-span";
 import { getErrorMessage } from "@/shared/utils/get-error-msg";
 import { deleteTimeSpan } from "../model/delete-time-span";
+import { TimeSpan } from "@/shared/types/bd-types";
+
+type TimeSpanCacheItem = TimeSpan & {
+  availabilityId?: string;
+  optimistic?: boolean;
+  locallyCreatedAt?: number;
+};
+
+const LOCALLY_CREATED_TIMESPAN_TTL = 15_000;
+
+const isSameTimeSpanSlot = (a: TimeSpanCacheItem, b: TimeSpanCacheItem) =>
+  a.week_day === b.week_day &&
+  a.start_time === b.start_time &&
+  a.end_time === b.end_time;
+
+const mergeLocalTimeSpans = (
+  oldData: TimeSpanCacheItem[] | undefined,
+  newData: TimeSpanCacheItem[],
+) => {
+  if (!oldData) return newData;
+
+  const now = Date.now();
+  const localTimeSpans = oldData.filter((span) => {
+    const isFreshLocalSpan =
+      span.optimistic ||
+      (span.locallyCreatedAt !== undefined &&
+        now - span.locallyCreatedAt < LOCALLY_CREATED_TIMESPAN_TTL);
+
+    if (!isFreshLocalSpan) return false;
+
+    return !newData.some(
+      (newSpan) =>
+        newSpan.id === span.id || isSameTimeSpanSlot(newSpan, span),
+    );
+  });
+
+  return [...newData, ...localTimeSpans];
+};
 
 export const useTimeSpans = (availabilityId: string, enabled: boolean) => {
   return useQuery({
     queryKey: ["availability-time-spans", availabilityId],
     queryFn: () => getTimeSpans(availabilityId),
     enabled,
+    structuralSharing: (oldData, newData) =>
+      mergeLocalTimeSpans(
+        oldData as TimeSpanCacheItem[] | undefined,
+        newData as TimeSpanCacheItem[],
+      ),
   });
 };
 
@@ -61,6 +104,7 @@ export const useCreateTimeSpan = () => {
         end_time: newTimeSpan.end_time,
         active: newTimeSpan.active ?? true,
         optimistic: true,
+        locallyCreatedAt: Date.now(),
       };
 
       queryClient.setQueryData(
@@ -85,7 +129,9 @@ export const useCreateTimeSpan = () => {
           if (!old) return old;
 
           return old.map((span) =>
-            span.id === context?.optimisticId ? data : span,
+            span.id === context?.optimisticId
+              ? { ...data, locallyCreatedAt: Date.now() }
+              : span,
           );
         },
       );
@@ -102,6 +148,12 @@ export const useCreateTimeSpan = () => {
       }
 
       toast.error(getErrorMessage(err));
+    },
+
+    onSettled: (_data, _error, vars) => {
+      queryClient.invalidateQueries({
+        queryKey: ["availability-time-spans", vars.availabilityId],
+      });
     },
   });
 };

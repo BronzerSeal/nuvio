@@ -6,6 +6,7 @@ import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useParams } from "next/navigation";
 import {
+  useCompanyTimeline,
   useDeleteTimelineRows,
   useDeleteTimelineTasks,
   useTimelineRows,
@@ -32,7 +33,9 @@ export const DelFromTimelineModal: React.FC<Props> = ({
     useDeleteTimelineRows();
   const { mutate: deleteTimelineTasks, isPending: isDelTaskPending } =
     useDeleteTimelineTasks();
-  const { timelineId } = useParams() as { timelineId: string | undefined };
+  const { companyId } = useParams() as { companyId?: string };
+  const { data: timeline } = useCompanyTimeline(companyId!, !!companyId);
+  const timelineId = timeline?.id;
   const { data: timelineRows } = useTimelineRows(timelineId!, !!timelineId);
   const { data: timelineTasks } = useTimelineTasks(timelineId!, !!timelineId);
 

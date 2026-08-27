@@ -7,7 +7,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { getErrorMessage } from "@/shared/utils/get-error-msg";
 import { useParams } from "next/navigation";
-import { useCreateTimelineRow } from "../queries/queries";
+import { useCompanyTimeline, useCreateTimelineRow } from "../queries/queries";
 
 interface IFormInput {
   rowName: string;
@@ -23,7 +23,9 @@ export const CreateTimelineRowModal: React.FC<Props> = ({
   setIsOpen,
 }) => {
   const { mutate, isPending } = useCreateTimelineRow();
-  const { timelineId } = useParams() as { timelineId: string | undefined };
+  const { companyId } = useParams() as { companyId?: string };
+  const { data: timeline } = useCompanyTimeline(companyId!, !!companyId);
+  const timelineId = timeline?.id;
 
   const {
     register,

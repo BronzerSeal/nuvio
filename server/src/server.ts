@@ -8,6 +8,8 @@ import userRouter from "./routes/user.routes.js";
 import taskRouter from "./routes/task.routes.js";
 import timelineRouter from "./routes/timeline.route.js";
 import availabilityRouter from "./routes/availability.routes.js";
+import serverRouter from "./routes/server.routes.js";
+import chatRouter from "./routes/chat.routes.js";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
 import "dotenv/config";
@@ -49,6 +51,8 @@ app.use("/api/user", userRouter);
 app.use("/api/task", taskRouter);
 app.use("/api/timeline", timelineRouter);
 app.use("/api/availability", availabilityRouter);
+app.use("/api/chat", chatRouter);
+app.use("/api/server", serverRouter);
 
 //ERRORS
 app.use(errorHandler);

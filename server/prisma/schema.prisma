@@ -18,6 +18,8 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  bio           String?   @default("")
+  urls          Url[]     
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -28,6 +30,14 @@ model User {
 
   @@unique([email])
   @@map("user")
+}
+
+model Url {
+  id        String   @id @default(cuid())   
+  userId    String
+  value     String
+
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {
@@ -89,6 +99,7 @@ model Company {
   boards  Board[]
   timeline Timeline?
   availability Availability?
+  chat Chat?
 }
 
 enum CompanyRoles {
@@ -220,4 +231,37 @@ model TimeSpan {
   active          Boolean
 
   availability    Availability @relation(fields: [availabilityId],references: [id], onDelete: Cascade)
+}
+
+//CHAT
+
+model Chat {
+  id          String          @id @default(cuid())
+  companyId   String          @unique()
+  conversations ChatConversation[]
+
+  company     Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model ChatConversation {
+  id       String @id @default(cuid())
+  chatId   String
+  user1Id  String
+  user2Id  String
+
+  chat     Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@unique([chatId, user1Id, user2Id])
+}
+
+model ChatMessage {
+  id          String        @id @default(cuid())
+  conversationId       String
+  senderId    String
+  message     String
+
+  createdAt   DateTime      @default(now())
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }

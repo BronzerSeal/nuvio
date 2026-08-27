@@ -9,10 +9,16 @@ export const SERVER_ENDPOINTS = {
     companyTimeline: (companyId: string) => `/company/${companyId}/timeline`,
     companyAvailability: (companyId: string) =>
       `/company/${companyId}/availability`,
+
+    companyTasks: (companyId: string) => `/company/${companyId}/tasks`,
+    companyTasksCount: (companyId: string) =>
+      `/company/${companyId}/tasks-count`,
   },
   user: {
     getMemberships: "user/me/companies",
     findUsers: "user/",
+    findMe: "user/me",
+    updateMe: "user/me",
   },
   board: {
     createBoard: "/board/new-board",
@@ -50,5 +56,15 @@ export const SERVER_ENDPOINTS = {
       `/availability/${availabilityId}/timeSpans/${timeSpanId}`,
     deleteTimeSpan: (availabilityId: string, timeSpanId: string) =>
       `/availability/${availabilityId}/timeSpans/${timeSpanId}`,
+  },
+  chat: {
+    getChatMembers: (companyId: string) => `/chat/${companyId}`,
+    getConversation: (companyId: string, userId: string) =>
+      `/chat/${companyId}/conversation/${userId}`,
+    getChatMessages: (companyId: string, conversationId: string) =>
+      `/chat/${companyId}/${conversationId}`,
+  },
+  server: {
+    serverStatus: "server/server-status",
   },
 };

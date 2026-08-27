@@ -6,6 +6,7 @@ export type User = {
   emailVerified: boolean;
   id: string;
   image: null | string;
+  bio: string;
   name: string;
   updatedAt: string;
 };
@@ -18,11 +19,16 @@ export type UserWithMembershipsId = Omit<
   memberships: string[] | [];
 };
 
+export type UserWithUrls = User & {
+  urls: { value: string }[];
+};
+
 export type CroppedUser = {
   id: string;
   email: string;
   image: string | undefined;
   name: string;
+  bio: string;
 };
 
 export type Company = {
@@ -55,6 +61,7 @@ export type Task = {
     id: string;
     image: string | undefined;
     name: string;
+    email: string;
   };
 
   createdAt: Date;
@@ -117,4 +124,20 @@ export interface TimeSpan {
 export type Availability = {
   companyId: string;
   id: string;
+};
+
+//CHAT
+
+export type ChatMember = {
+  id: string;
+  user: CroppedUser;
+};
+
+export type ChatMessage = {
+  id: string;
+  chatId: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  createdAt: string;
 };

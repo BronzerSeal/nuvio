@@ -29,7 +29,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex flex-col overflow-x-hidden bg-background text-foreground">
         <Providers>{children}</Providers>
       </body>
     </html>

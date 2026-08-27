@@ -6,7 +6,11 @@ import { Label } from "@/shared/ui/label";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useParams } from "next/navigation";
-import { useCreateTimelineTask, useTimelineRows } from "../queries/queries";
+import {
+  useCompanyTimeline,
+  useCreateTimelineTask,
+  useTimelineRows,
+} from "../queries/queries";
 import { SelectType } from "./select-type";
 import { SelectRow } from "./select-row";
 import { getErrorMessage } from "@/shared/utils/get-error-msg";
@@ -29,7 +33,9 @@ export const CreateTimelineTaskModal: React.FC<Props> = ({
   setIsOpen,
 }) => {
   const { mutate, isPending } = useCreateTimelineTask();
-  const { timelineId } = useParams() as { timelineId: string | undefined };
+  const { companyId } = useParams() as { companyId?: string };
+  const { data: timeline } = useCompanyTimeline(companyId!, !!companyId);
+  const timelineId = timeline?.id;
   const { data: timelineRows } = useTimelineRows(timelineId!, !!timelineId);
 
   const {

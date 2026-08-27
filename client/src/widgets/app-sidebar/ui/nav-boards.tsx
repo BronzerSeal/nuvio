@@ -12,8 +12,10 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuAction,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/shared/ui/sidebar";
-import { MoreHorizontal, Forward, Trash2 } from "lucide-react";
+import { MoreHorizontal, Forward, Trash2, PlusIcon } from "lucide-react";
 import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { useCompanyBoards, useDeleteBoard } from "@/entity/board";
 import { useParams } from "next/navigation";
@@ -21,9 +23,12 @@ import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
 import { SimpleLoader } from "@/shared/ui/loader";
 import { toast } from "sonner";
 import Link from "next/link";
+import React from "react";
+import { CreateBoardModal } from "@/entity/board/ui/create-board-modal";
 
 const NavBoards = () => {
   const isMobile = useIsMobile();
+  const [isNewBoardOpen, setIsNewBoardOpen] = React.useState(false);
   const { companyId, boardId } = useParams() as {
     companyId?: string;
     boardId?: string;
@@ -35,14 +40,30 @@ const NavBoards = () => {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Boards</SidebarGroupLabel>
+      <SidebarGroupLabel>{!companyId ? "" : "Boards"}</SidebarGroupLabel>
       <SidebarMenu>
+        {/* new board */}
+
+        {companyId && (
+          <SidebarMenuSubItem
+            className="cursor-pointer"
+            onClick={() => setIsNewBoardOpen((prev) => !prev)}
+          >
+            <SidebarMenuSubButton asChild className="h-8">
+              <div>
+                <PlusIcon />
+                <p>new board</p>
+              </div>
+            </SidebarMenuSubButton>
+          </SidebarMenuSubItem>
+        )}
+
         {isCompanyBoardsLoading ? (
           <div className="p-2">
             <SimpleLoader />
           </div>
         ) : !companyId ? (
-          <p>no company</p>
+          <p></p>
         ) : (
           companyBoards?.map((item) => (
             <SidebarMenuItem key={item.id}>
@@ -93,6 +114,10 @@ const NavBoards = () => {
             <span>More</span>
           </SidebarMenuButton>
         </SidebarMenuItem> */}
+        <CreateBoardModal
+          isOpen={isNewBoardOpen}
+          setIsOpen={setIsNewBoardOpen}
+        />
       </SidebarMenu>
     </SidebarGroup>
   );

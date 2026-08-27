@@ -42,6 +42,18 @@ type GetAvailabilityParams = {
   companyId: string;
 };
 
+type GetTasksParams = {
+  userId: string;
+  companyId: string;
+  limit: number;
+  cursorId?: string;
+};
+
+type GetTasksCountParams = {
+  userId: string;
+  companyId: string;
+};
+
 export const joinOrCreate = async ({
   companyName,
   description,
@@ -63,7 +75,7 @@ export const joinOrCreate = async ({
       },
     });
 
-    //COMPANY TIMELINE && AVAILABILITY
+    //COMPANY TIMELINE && AVAILABILITY && CHAT
     await prisma.timeline.create({
       data: {
         companyId: company.id,
@@ -71,6 +83,12 @@ export const joinOrCreate = async ({
     });
 
     await prisma.availability.create({
+      data: {
+        companyId: company.id,
+      },
+    });
+
+    await prisma.chat.create({
       data: {
         companyId: company.id,
       },
@@ -156,6 +174,7 @@ export const getCompanyMembers = async ({
           email: true,
           image: true,
           id: true,
+          bio: true,
         },
       },
     },
@@ -268,4 +287,75 @@ export const getAvailability = async ({
   }
 
   return availability;
+};
+
+export const getTasks = async ({
+  userId,
+  companyId,
+  limit,
+  cursorId,
+}: GetTasksParams) => {
+  await requireCompanyRole(userId, companyId, ["owner", "admin", "member"]);
+
+  const take = Number.isFinite(Number(limit)) ? Number(limit) : 50;
+
+  const tasks = await prisma.task.findMany({
+    where: {
+      board: {
+        companyId,
+      },
+    },
+
+    include: {
+      assignee: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          email: true,
+        },
+      },
+      board: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+
+    take: take + 1,
+
+    cursor: cursorId ? { id: cursorId } : undefined,
+
+    orderBy: {
+      id: "desc",
+    },
+  });
+
+  const hasNextPage = tasks.length > take;
+
+  const data = hasNextPage ? tasks.slice(0, -1) : tasks;
+
+  const lastItem = data[data.length - 1];
+
+  return {
+    data,
+    nextCursor: lastItem ? lastItem.id : null,
+    hasNextPage,
+  };
+};
+
+export const getTasksCount = async ({
+  userId,
+  companyId,
+}: GetTasksCountParams) => {
+  await requireCompanyRole(userId, companyId, ["owner", "admin", "member"]);
+
+  return prisma.task.count({
+    where: {
+      board: {
+        companyId,
+      },
+    },
+  });
 };

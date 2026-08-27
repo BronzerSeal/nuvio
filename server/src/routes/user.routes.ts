@@ -1,7 +1,5 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware.js";
-import prisma from "../lib/prisma.js";
-import { BadRequestError } from "../errors/BadRequestError.js";
 import { validate } from "../middleware/validate.middleware.js";
 import { userValidation } from "../validate/index.js";
 import { userController } from "../controllers/index.js";
@@ -26,6 +24,21 @@ router.get(
     query: userValidation.searchUsersQuerySchema,
   }),
   userController.searchUsers,
+);
+
+//user settings
+
+// GET user/me
+router.get("/me", authMiddleware, userController.getMe);
+
+// PATCH user/me
+router.patch(
+  "/me",
+  authMiddleware,
+  validate({
+    body: userValidation.updateUsersQuerySchema,
+  }),
+  userController.updateMe,
 );
 
 export default router;

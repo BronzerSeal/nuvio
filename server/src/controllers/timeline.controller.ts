@@ -51,28 +51,28 @@ type UpdateTimelineTaskRequest = Request<
 >;
 
 const createRow = async (req: CreateTimelineRowRequest, res: Response) => {
-  const row = await timelineService.createRow({
+  const { row, companyId } = await timelineService.createRow({
     userId: req.user.id,
     timelineId: req.params.timelineId,
     rowName: req.body.rowName,
   });
 
-  io.to(req.params.timelineId).emit("timeline-row-updated");
+  io.to(`schedule:${companyId}`).emit("timeline-row-updated");
 
   return res.status(201).json(row);
 };
 
 const deleteRows = async (req: DeleteRowsRequest, res: Response) => {
-  const deletedCount = await timelineService.deleteRows({
+  const { count, companyId } = await timelineService.deleteRows({
     userId: req.user.id,
     timelineId: req.params.timelineId,
     rowIds: req.body.rowIds,
   });
 
-  io.to(req.params.timelineId).emit("timeline-row-updated");
+  io.to(`schedule:${companyId}`).emit("timeline-row-updated");
 
   return res.status(200).json({
-    deletedCount,
+    count,
   });
 };
 
@@ -86,14 +86,14 @@ const getRows = async (req: GetTimelineRowsRequest, res: Response) => {
 };
 
 const createTask = async (req: CreateTimelineTaskRequest, res: Response) => {
-  const task = await timelineService.createTask({
+  const { task, companyId } = await timelineService.createTask({
     userId: req.user.id,
     timelineId: req.params.timelineId,
     rowId: req.params.rowId,
     ...req.body,
   });
 
-  io.to(req.params.timelineId).emit("timeline-task-updated");
+  io.to(`schedule:${companyId}`).emit("timeline-task-updated");
 
   return res.status(201).json(task);
 };
@@ -108,26 +108,26 @@ const getTasks = async (req: GetTimelineTasksRequest, res: Response) => {
 };
 
 const updateTask = async (req: UpdateTimelineTaskRequest, res: Response) => {
-  const task = await timelineService.updateTask({
+  const { task, companyId } = await timelineService.updateTask({
     userId: req.user.id,
     timelineId: req.params.timelineId,
     taskId: req.params.taskId,
     ...req.body,
   });
 
-  io.to(req.params.timelineId).emit("timeline-task-updated");
+  io.to(`schedule:${companyId}`).emit("timeline-task-updated");
 
   return res.status(200).json(task);
 };
 
 const deleteTasks = async (req: DeleteTimelineTasksRequest, res: Response) => {
-  const deletedCount = await timelineService.deleteTasks({
+  const { deletedCount, companyId } = await timelineService.deleteTasks({
     userId: req.user.id,
     timelineId: req.params.timelineId,
     taskIds: req.body.taskIds,
   });
 
-  io.to(req.params.timelineId).emit("timeline-task-updated");
+  io.to(`schedule:${companyId}`).emit("timeline-task-updated");
 
   return res.status(200).json({
     deletedCount,

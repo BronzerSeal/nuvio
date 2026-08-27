@@ -7,10 +7,10 @@ import { SidebarTrigger } from "@/shared/ui/sidebar";
 export function SearchPanel() {
   const isMobile = useIsMobile();
   return (
-    <div className="w-full flex flex-col ">
+    <div className="w-full flex flex-col z-10">
       <div className="p-2 flex items-center">
         {isMobile && <SidebarTrigger />}
-        <Input placeholder="search" className="max-w-50" />
+        <Input placeholder="Search" className="max-w-50" />
       </div>
 
       <Separator />

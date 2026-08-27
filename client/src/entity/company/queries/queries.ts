@@ -5,6 +5,8 @@ import { queryClient } from "@/shared/lib/query-client";
 import { CompanyIcon } from "../consts/company-icons";
 import { getUserCompanies } from "../model/get-user-companies";
 import getCompanyMemberships from "../model/get-user-memberships";
+import { getCompanyTasks } from "../model/get-company-tasks";
+import { getCompanyTasksCount } from "../model/get-company-tasks-count";
 
 export const useJoinOrCreateCompany = () => {
   return useMutation({
@@ -56,6 +58,32 @@ export const useCompanyMemberships = (companyId: string, enabled: boolean) => {
     },
     select: (result) => result.pages.flatMap((p) => p.data),
 
+    enabled,
+  });
+};
+
+export const useCompanyTasks = (companyId: string, enabled: boolean) => {
+  return useInfiniteQuery({
+    queryKey: ["company-tasks", companyId],
+
+    queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
+      getCompanyTasks(companyId, pageParam),
+
+    initialPageParam: undefined,
+
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasNextPage ? lastPage.nextCursor : undefined;
+    },
+    select: (result) => result.pages.flatMap((p) => p.data),
+
+    enabled,
+  });
+};
+
+export const useCompanyTasksCount = (companyId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ["company-tasks-count", companyId],
+    queryFn: () => getCompanyTasksCount(companyId),
     enabled,
   });
 };

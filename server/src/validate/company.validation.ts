@@ -38,6 +38,19 @@ export const getAvailabilityParamsSchema = z.object({
   companyId: z.string(),
 });
 
+export const getTasksParamsSchema = z.object({
+  companyId: z.string(),
+});
+
+export const getTasksQuerySchema = z.object({
+  cursor: z.string().optional(),
+  limit: z.coerce.number().min(1).max(100).default(50),
+});
+
+export const getTasksCountParamsSchema = z.object({
+  companyId: z.string(),
+});
+
 export type JoinOrCreateDto = z.infer<typeof joinOrCreateSchema>;
 
 export type GetCompanyMembersParamsDto = z.infer<
@@ -61,3 +74,9 @@ export type GetTimelineParamsDto = z.infer<typeof getTimelineParamsSchema>;
 export type GetAvailabilityParamsDto = z.infer<
   typeof getAvailabilityParamsSchema
 >;
+
+export type GetTasksParamsDto = z.infer<typeof getTasksParamsSchema>;
+
+export type GetTasksQueryDto = z.infer<typeof getTasksQuerySchema>;
+
+export type GetTasksCountParamsDto = z.infer<typeof getTasksCountParamsSchema>;

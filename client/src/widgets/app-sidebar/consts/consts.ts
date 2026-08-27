@@ -1,71 +1,46 @@
-import { SITE_ENDPOINTS } from "@/shared/config/site-endpoints";
-import { BookOpen, Settings2, Frame, PieChart } from "lucide-react";
+import {
+  Blocks,
+  ClipboardClock,
+  MessageCircle,
+  Palette,
+  StickyNotes,
+  UserPen,
+} from "lucide-react";
 
 export const DATA = {
   navMain: [
     {
-      title: "Documentation",
-      url: "#",
-      isActive: true,
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      title: "Dashboard",
+      url: "/",
+      icon: Blocks,
     },
     {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: `${SITE_ENDPOINTS.account}/settings`,
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      title: "Tasks",
+      url: "/tasks",
+      icon: StickyNotes,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
+      title: "Schedule",
+      url: "/schedule",
+      icon: ClipboardClock,
     },
     {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      title: "Chat",
+      url: "/chat",
+      icon: MessageCircle,
     },
   ],
 };
+
+export const USER_NAV_URLS = [
+  {
+    title: "Profile",
+    url: "profile",
+    icon: UserPen,
+  },
+  {
+    title: "Appearance",
+    url: "appearance",
+    icon: Palette,
+  },
+];

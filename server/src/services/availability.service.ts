@@ -104,7 +104,7 @@ export const createTimeSpan = async ({
   ]);
 
   const isActive = active ?? true;
-  return prisma.timeSpan.create({
+  const timeSpan = await prisma.timeSpan.create({
     data: {
       availabilityId,
       weekDay: week_day,
@@ -113,6 +113,11 @@ export const createTimeSpan = async ({
       active: isActive,
     },
   });
+
+  return {
+    timeSpan,
+    companyId: availability.companyId,
+  };
 };
 
 export const updateTimeSpan = async ({
@@ -159,8 +164,7 @@ export const updateTimeSpan = async ({
       message: "Time span not found",
     });
   }
-
-  return prisma.timeSpan.update({
+  const updatedTimeSpan = await prisma.timeSpan.update({
     where: {
       id: timeSpanId,
     },
@@ -171,6 +175,11 @@ export const updateTimeSpan = async ({
       ...(active !== undefined && { active }),
     },
   });
+
+  return {
+    timeSpan: updatedTimeSpan,
+    companyId: availability.companyId,
+  };
 };
 
 export const deleteTimeSpan = async ({
@@ -212,9 +221,14 @@ export const deleteTimeSpan = async ({
     });
   }
 
-  return prisma.timeSpan.delete({
+  const deletedTimeSpan = await prisma.timeSpan.delete({
     where: {
       id: timeSpanId,
     },
   });
+
+  return {
+    timeSpan: deletedTimeSpan,
+    companyId: availability.companyId,
+  };
 };
